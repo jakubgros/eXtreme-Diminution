@@ -18,6 +18,36 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Compressor.h" />
+    <ClInclude Include="Converter.h" />
+    <ClInclude Include="Decompressor.h" />
+    <ClInclude Include="Display.h" />
+    <ClInclude Include="Facade.h" />
+    <ClInclude Include="FileReader.h" />
+    <ClInclude Include="Loader.h" />
+    <ClInclude Include="ObjectsCreator.h" />
+    <ClInclude Include="Saver.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="UsersInterface.h" />
+    <ClInclude Include="Validator.h" />
+    <ClInclude Include="FileWriter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Compressor.cpp" />
+    <ClCompile Include="Converter.cpp" />
+    <ClCompile Include="Decompressor.cpp" />
+    <ClCompile Include="Display.cpp" />
+    <ClCompile Include="Facade.cpp" />
+    <ClCompile Include="FileReader.cpp" />
+    <ClCompile Include="Loader.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObjectsCreator.cpp" />
+    <ClCompile Include="Saver.cpp" />
+    <ClCompile Include="UsersInterface.cpp" />
+    <ClCompile Include="Validator.cpp" />
+    <ClCompile Include="FileWriter.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{726FD3A9-B69B-4C8F-BAC9-C4F476F937CD}</ProjectGuid>
@@ -110,8 +140,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
