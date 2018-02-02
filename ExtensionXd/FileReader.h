@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "types.h"
+#include "Types.h"
 
 class FileReader
 {
@@ -19,7 +19,7 @@ protected:
 public:
 	virtual ~XdFileReader();
 	explicit XdFileReader(ImgWithParam* img): FileReader(img), dictionary(nullptr){};
-	void read() override; //TODO: wczytuje z pliku podanego jako input w img i zapisuje wszystko do img, a slownik do dictionary
+	void read() override; 
 	const Dictionary* getDictionary() override;
 };
 

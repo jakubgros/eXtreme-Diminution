@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "types.h"
+#include "Types.h"
 
 
 class Decompressor
@@ -14,10 +14,21 @@ public:
 
 class XdDecompressor : public Decompressor
 {
+	struct DecodeTree
+	{
+		DecodeTree * next;
+		DecodeTree * left;
+		DecodeTree * right;
+		int ColorNumber;
+	};
+	std::vector<std::string> CompressedPixmap;
 public:
-	virtual ~XdDecompressor()=default;
-	explicit XdDecompressor(ImgWithParam* img): Decompressor(img){};
+	virtual ~XdDecompressor() = default;
+	explicit XdDecompressor(ImgWithParam* img);
 	void decompress(const Dictionary* dictionary) override; //TODO: implement
+	void MakeTree(DecodeTree * &root, const Dictionary* dictionary);
+	void DecodeCode(DecodeTree* root, std::vector<std::string> CompressedPixmap, ImgWithParam* img);
+	void DeleteTree(DecodeTree* root);
 };
 
 class BmpDecompressor : public Decompressor

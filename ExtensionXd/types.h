@@ -19,6 +19,13 @@ struct Rgb
 	int b;
 };
 
+struct Lab
+{
+	double l;
+	double a;
+	double b;
+};
+
 struct Word //TODO: check if types are ok
 {
 	int number;
@@ -42,4 +49,41 @@ struct ImgWithParam
 	long long fileSize;
 	std::string inputFilepath;
 	std::string outputFilepath;
+	std::vector<std::string> compressedPixmap;
 };
+
+struct bitmap_file_header
+{
+	unsigned char   bitmap_type[2];
+	int             fileSize;
+	short           reserved1;
+	short           reserved2;
+	unsigned int    offsetBits;
+};
+
+struct bitmap_image_header
+{
+	unsigned int    sizeHeader;
+	unsigned int    width;
+	unsigned int    height;
+	short int       planes;
+	short int       bitCount;
+	unsigned int    compression;
+	unsigned int    imageSize;
+	unsigned int    ppmX;
+	unsigned int    ppmY;
+	unsigned int    clrUsed;
+	unsigned int    clrImportant;
+};
+
+Rgb operator+ (const Rgb &left, const Rgb& right);
+
+Rgb operator-(const Rgb &left, const Rgb& right);
+
+Rgb operator*(const double &left, const Rgb& right);
+
+Rgb operator*(const Rgb& left, const double& right);
+
+bool operator !=(const Rgb& left,const Rgb& right);
+
+bool operator ==(const Rgb& left,const Rgb& right);

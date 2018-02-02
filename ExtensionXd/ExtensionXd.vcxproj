@@ -24,11 +24,12 @@
     <ClInclude Include="Decompressor.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="Facade.h" />
+    <ClInclude Include="FileBitStream.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="Loader.h" />
     <ClInclude Include="ObjectsCreator.h" />
     <ClInclude Include="Saver.h" />
-    <ClInclude Include="types.h" />
+    <ClInclude Include="Types.h" />
     <ClInclude Include="UsersInterface.h" />
     <ClInclude Include="Validator.h" />
     <ClInclude Include="FileWriter.h" />
@@ -39,11 +40,13 @@
     <ClCompile Include="Decompressor.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="Facade.cpp" />
+    <ClCompile Include="FileBitStream.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="Loader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjectsCreator.cpp" />
     <ClCompile Include="Saver.cpp" />
+    <ClCompile Include="Types.cpp" />
     <ClCompile Include="UsersInterface.cpp" />
     <ClCompile Include="Validator.cpp" />
     <ClCompile Include="FileWriter.cpp" />
