@@ -2,6 +2,12 @@
 #include "Types.h"
 #include <iostream>
 
+UsersInterface::UsersInterface() :
+	inputPath("")
+{
+	
+}
+
 void UsersInterface::printMsgToUser(std::string msg)
 {
 	std::cout << msg;
@@ -10,9 +16,8 @@ void UsersInterface::printMsgToUser(std::string msg)
 std::string UsersInterface::loadInputPath()
 {
 	std::cout << "Wprowadz sciezke do pliku wejsciowego: ";
-	std::string path;
-	std::cin >> path;
-	return path;
+	std::cin >> inputPath;
+	return inputPath;
 }
 
 std::string UsersInterface::loadOuputPath()
@@ -33,4 +38,18 @@ ColorMode UsersInterface::loadColorMode()
 	unsigned int mode;
 	std::cin >> mode;
 	return ColorMode(mode);
+}
+
+std::string UsersInterface::getInputExtension()
+{
+	std::string extension = "";
+	for (int i = inputPath.size() - 1; i >= 0; --i)
+	{
+		if (inputPath[i] != '.')
+			extension += inputPath[i];
+		else
+			break;
+	}
+	std::reverse(extension.begin(), extension.end());
+	return extension;
 }

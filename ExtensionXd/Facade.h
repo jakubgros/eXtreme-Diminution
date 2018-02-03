@@ -22,6 +22,7 @@ class Facade
 	Saver* saver;
 
 public:
+	void fillImposedPalettes();
 	void getInfoFromUser();
 	void makeCreator();
 	void load();

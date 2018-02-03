@@ -94,7 +94,7 @@ void XdDecompressor::DecodeCode(DecodeTree* root, std::vector<std::string> Compr
 			if (img->colorMode == GREY_SCALE)
 				img->pixmap[currentHeight][currentWidth] = img->imposedGreyPalette[currentNode->ColorNumber];
 			else if (img->colorMode == IMPOSED)
-				img->pixmap[currentHeight][currentWidth] = img->imposedGreyPalette[currentNode->ColorNumber];
+				img->pixmap[currentHeight][currentWidth] = img->imposedColorPalette[currentNode->ColorNumber];
 			else if (img->colorMode == DEDICATED)
 				img->pixmap[currentHeight][currentWidth] = img->dedicatedColorPalette[currentNode->ColorNumber];
 
