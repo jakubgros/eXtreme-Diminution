@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <bitset>
 
 class FileBitStream
 {
@@ -8,6 +9,7 @@ class FileBitStream
 	int bitCounter;
 	int bytesProcessed;
 	char openMode;
+	unsigned char mostSignif;
 
 	size_t fillBuffer();
 public:
@@ -17,9 +19,12 @@ public:
 	void writeBit(bool bit);
 	void write(char c);
 	template <typename T> void write(T& data, size_t nOfBits);
-	bool readBit();
+	bool readBit(bool &bitRead); //returns false if eof, true if success. Read bit is assigned to bitRead
+	unsigned char readByte(); //throws exception if there is not enough data
+	template <typename toType> toType read(size_t nOfBits);
+	std::bitset<64> readBitset(size_t nOfBits);
 	explicit FileBitStream(std::string filePath, char openMode);
-	FileBitStream()=default;
+	FileBitStream();
 	void open(std::string filePath, char openMode);
 	~FileBitStream();
 };
@@ -36,4 +41,25 @@ void FileBitStream::write(T& data, size_t nOfBits)
 		int bit= tempBuff[counter%BITS_IN_BYTE]>>counter & 1;
 		writeBit(bit);
 	}
+}
+
+template <typename toType>
+toType FileBitStream::read(size_t nOfBits)
+{
+	toType temp=0;
+
+	for(int i=0; i<nOfBits; ++i)
+	{
+		bool bit;
+
+		if(readBit(bit)==false)
+			throw std::exception("not enough data in stream");
+
+		if(bit)
+			temp|=1;
+
+		temp<<=1;
+	}
+
+	return temp;
 }

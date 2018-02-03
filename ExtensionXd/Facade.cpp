@@ -67,3 +67,15 @@ void Facade::run()
 		printImg();
 	save();
 }
+
+Facade::~Facade()
+{
+	delete img;
+	delete creator;
+	delete colorMode;
+	delete usersInterface;
+	delete converter;
+	delete display;
+	delete loader;
+	delete saver;
+}

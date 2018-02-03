@@ -16,7 +16,7 @@ class BmpValidator : public Validator
 public:
 	virtual ~BmpValidator()=default;
 	explicit BmpValidator(ImgWithParam* img): Validator(img){};
-	bool validate() override;
+	bool validate() override {return true;}; //TODO
 };
 
 class XdValidator : public Validator
@@ -24,5 +24,5 @@ class XdValidator : public Validator
 public:
 	virtual ~XdValidator()=default;
 	explicit XdValidator(ImgWithParam* img): Validator(img){};
-	bool validate() override;
+	bool validate() override {return true;}; //TODO
 };

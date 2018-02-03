@@ -1,11 +1,21 @@
 ﻿#include "ObjectsCreator.h"
 #include "FileWriter.h"
+#include "BmpFileWriter.h"
 #include "Compressor.h"
+#include "XdCompressor.h"
 #include <exception>
 #include "Validator.h"
 #include "FileReader.h"
+#include "BmpFileReader.h"
 #include "Decompressor.h"
+#include "XdDecompressor.h"
 #include "Converter.h"
+#include "ToDedicatedPixmapConverter.h"
+#include "ToGreyScalePixmapConverter.h"
+#include "ToImposedPixmapConverter.h"
+#include "XdToBmpConverter.h"
+#include "XdFileWriter.h"
+#include "XdFileReader.h"
 
 FileWriter* ObjectCreator::createFileWriter(const ImgWithParam* img)
 {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BmpFileReader.h" />
+    <ClInclude Include="BmpFileWriter.h" />
     <ClInclude Include="Compressor.h" />
     <ClInclude Include="Converter.h" />
     <ClInclude Include="Decompressor.h" />
@@ -28,13 +30,24 @@
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="Loader.h" />
     <ClInclude Include="ObjectsCreator.h" />
+    <ClInclude Include="Range.h" />
     <ClInclude Include="Saver.h" />
+    <ClInclude Include="ToDedicatedPixmapConverter.h" />
+    <ClInclude Include="ToGreyScalePixmapConverter.h" />
+    <ClInclude Include="ToImposedPixmapConverter.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="UsersInterface.h" />
     <ClInclude Include="Validator.h" />
     <ClInclude Include="FileWriter.h" />
+    <ClInclude Include="XdCompressor.h" />
+    <ClInclude Include="XdDecompressor.h" />
+    <ClInclude Include="XdFileReader.h" />
+    <ClInclude Include="XdFileWriter.h" />
+    <ClInclude Include="XdToBmpConverter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BmpFileReader.cpp" />
+    <ClCompile Include="BmpFileWriter.cpp" />
     <ClCompile Include="Compressor.cpp" />
     <ClCompile Include="Converter.cpp" />
     <ClCompile Include="Decompressor.cpp" />
@@ -45,11 +58,20 @@
     <ClCompile Include="Loader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjectsCreator.cpp" />
+    <ClCompile Include="Range.cpp" />
     <ClCompile Include="Saver.cpp" />
+    <ClCompile Include="ToDedicatedPixmapConverter.cpp" />
+    <ClCompile Include="ToGreyScalePixmapConverter.cpp" />
+    <ClCompile Include="ToImposedPixmapConverter.cpp" />
     <ClCompile Include="Types.cpp" />
     <ClCompile Include="UsersInterface.cpp" />
     <ClCompile Include="Validator.cpp" />
     <ClCompile Include="FileWriter.cpp" />
+    <ClCompile Include="XdCompressor.cpp" />
+    <ClCompile Include="XdDecompressor.cpp" />
+    <ClCompile Include="XdFileReader.cpp" />
+    <ClCompile Include="XdFileWriter.cpp" />
+    <ClCompile Include="XdToBmpConverter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -108,7 +130,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Libraries CPP\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Libraries CPP\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -124,10 +152,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Libraries CPP\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Libraries CPP\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

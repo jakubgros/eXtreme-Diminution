@@ -1,5 +1,5 @@
 #include "FileBitStream.h"
-
+#include <bitset>
 
 size_t FileBitStream::fillBuffer()
 {
@@ -44,8 +44,7 @@ void FileBitStream::write(char c)
 	}
 }
 
-
-bool FileBitStream::readBit()
+bool FileBitStream::readBit(bool &bitRead)
 {
 	if(bitCounter==0)
 	{
@@ -53,10 +52,36 @@ bool FileBitStream::readBit()
 		if (bitCounter==0) return false; //eof
 	}
 
-	bool bitToReturn= (buffer & 1) == 1 ? true: false;
-	buffer >>=1; // shift
+	bool bitToReturn= (buffer & mostSignif) == mostSignif ? true: false;
+	buffer <<=1; // shift
 	--bitCounter;
-	return bitToReturn;
+
+	bitRead=bitToReturn;
+	return true; //not eof
+}
+
+FileBitStream::FileBitStream()
+{
+	mostSignif|=1;
+	mostSignif<<=sizeof(mostSignif-1);
+}
+
+unsigned char FileBitStream::readByte()
+{
+	const int BITS_IN_BYTE=8;
+	bool bit;
+	unsigned char byte=0;
+	for(int i=0; i<BITS_IN_BYTE; ++i)
+	{
+		if(readBit(bit)==false)
+			throw std::exception("Not enough data to read a byte.");
+		else
+		{
+			byte|=mostSignif;
+			byte>>=1;
+		}
+	}
+	return byte;
 }
 
 FileBitStream::FileBitStream(std::string filePath, char openMode)
@@ -78,7 +103,7 @@ void FileBitStream::open(std::string filePath, char mode)
 	else
 		throw std::invalid_argument("invalid openMode passed to fileBuffer constructor");
 
-	file=fopen(filePath.c_str(), fopenMode);
+	fopen_s(&file, filePath.c_str(), fopenMode);
 
 	if(file==nullptr)
 		throw std::exception("can't open file");
@@ -92,3 +117,24 @@ FileBitStream::~FileBitStream()
 	fclose(file);
 }
 
+std::bitset<64> FileBitStream::readBitset(size_t nOfBits)
+{
+	std::bitset<64> temp;
+
+	temp.reset();
+
+	for(int i=0; i<nOfBits; ++i)
+	{
+		bool bit;
+
+		if(readBit(bit)==false)
+			throw std::exception("not enough data in stream");
+
+		if(bit)
+			temp|=1;
+
+		temp<<=1;
+	}
+
+	return temp;
+}
