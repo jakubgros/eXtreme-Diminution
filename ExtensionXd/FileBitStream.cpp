@@ -22,7 +22,7 @@ bool FileBitStream::flush()
 
 void FileBitStream::writeBit(bool bit)
 {
-	if(bitCounter==sizeof(buffer))
+	if(bitCounter==sizeof(buffer)*BITS_IN_BYTE)
 		flush();
 	else
 	{
@@ -35,12 +35,14 @@ void FileBitStream::writeBit(bool bit)
 
 void FileBitStream::write(char c)
 {
-	int counter=sizeof(char);
+
+	int counter=sizeof(char)*BITS_IN_BYTE;
 	while(counter>0)
 	{
 		int bit=c & 1;
 		c>>=1;
 		writeBit(bit);
+		--counter;
 	}
 }
 
@@ -63,12 +65,11 @@ bool FileBitStream::readBit(bool &bitRead)
 FileBitStream::FileBitStream()
 {
 	mostSignif|=1;
-	mostSignif<<=sizeof(mostSignif-1);
+	mostSignif<<=sizeof(mostSignif)*BITS_IN_BYTE-1;
 }
 
 unsigned char FileBitStream::readByte()
 {
-	const int BITS_IN_BYTE=8;
 	bool bit;
 	unsigned char byte=0;
 	for(int i=0; i<BITS_IN_BYTE; ++i)
@@ -92,7 +93,7 @@ FileBitStream::FileBitStream(std::string filePath, char openMode)
 void FileBitStream::open(std::string filePath, char mode)
 {
 	openMode=mode;
-	buffer<<=sizeof(buffer); //clean buffer
+	buffer<<=sizeof(buffer)*BITS_IN_BYTE; //clean buffer
 	bitCounter=0;
 
 	char* fopenMode;

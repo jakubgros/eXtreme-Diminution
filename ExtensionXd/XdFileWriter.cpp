@@ -1,6 +1,7 @@
 #include "XdFileWriter.h"
 #include "FileBitStream.h"
 #include <bitset>
+#include <iostream>
 
 
 
@@ -29,8 +30,8 @@ void XdFileWriter::writeFileHeader()
 
 void XdFileWriter::writeFileType()
 {
-	bitStream.write(img->fileType[0]);
-	bitStream.write(img->fileType[1]);
+	bitStream.write('x');
+	bitStream.write('d');
 }
 
 void XdFileWriter::writeFileSize() //TODO: implement

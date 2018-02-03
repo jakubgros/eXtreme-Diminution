@@ -15,5 +15,6 @@ int main()
 		return 1;
 	}
 
+	system("PAUSE");
 	return 0;
 }

@@ -20,9 +20,9 @@
 FileWriter* ObjectCreator::createFileWriter(const ImgWithParam* img)
 {
 	if(type==BMP)
-		return new BmpFileWriter(img);
-	if(type==XD)
 		return new XdFileWriter(img);
+	if(type==XD)
+		return new BmpFileWriter(img);
 }
 
 Compressor* ObjectCreator::createCompressor(ImgWithParam* imgWithParam)

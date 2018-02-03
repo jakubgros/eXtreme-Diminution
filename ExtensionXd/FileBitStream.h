@@ -4,6 +4,7 @@
 
 class FileBitStream
 {
+	const int BITS_IN_BYTE=8;
 	FILE* file;
 	unsigned char buffer;
 	int bitCounter;
@@ -40,6 +41,7 @@ void FileBitStream::write(T& data, size_t nOfBits)
 	{
 		int bit= tempBuff[counter%BITS_IN_BYTE]>>counter & 1;
 		writeBit(bit);
+		++counter;
 	}
 }
 

@@ -3,7 +3,7 @@
 XdDecompressor::XdDecompressor(ImgWithParam* img) :
 	Decompressor(img)
 {
-	initPixmap();
+
 }
 
 void XdDecompressor::initPixmap()
@@ -15,6 +15,7 @@ void XdDecompressor::initPixmap()
 
 void XdDecompressor::decompress(const Dictionary* dictionary)
 {
+	initPixmap();
 	DecodeTree* root;
 	MakeTree(root, dictionary);
 	DecodeCode(root, img->compressedPixmap, img);

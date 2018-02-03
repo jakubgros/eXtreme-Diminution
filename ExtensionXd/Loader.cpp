@@ -25,6 +25,7 @@ bool Loader::load()
 	if(validator->validate()==false)
 		return false;
 
+
 	const Dictionary* dictionary=fileReader->getDictionary();
 	decompressor->decompress(dictionary);
 
