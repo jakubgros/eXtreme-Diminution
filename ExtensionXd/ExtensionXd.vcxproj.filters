@@ -84,10 +84,10 @@
     <ClInclude Include="XdCompressor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XdFileWriter.h">
+    <ClInclude Include="XdFileReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XdFileReader.h">
+    <ClInclude Include="XdFileWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HuffmanTree.h">
@@ -170,10 +170,10 @@
     <ClCompile Include="XdCompressor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XdFileWriter.cpp">
+    <ClCompile Include="XdFileReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XdFileReader.cpp">
+    <ClCompile Include="XdFileWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HuffmanTree.cpp">

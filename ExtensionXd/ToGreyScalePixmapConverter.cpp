@@ -1,5 +1,6 @@
 #include "ToGreyScalePixmapConverter.h"
 #include "Types.h"
+#include <iostream>
 
 
 ToGreyScalePixmapConverter::ToGreyScalePixmapConverter(ImgWithParam* imgWithParam) :
@@ -18,6 +19,7 @@ void ToGreyScalePixmapConverter::convert()
 			oldPixel = colorToYUV(oldPixel);
 			Rgb newPixel = findClosestPaletteColor(oldPixel);
 			img->pixmap[x][y] = newPixel;
+		//	std::cout << img->pixmap[x][y].r << " " << img->pixmap[x][y].g << " " << img->pixmap[x][y].b << std::endl;
 			Rgb quantError = oldPixel - newPixel;
 			if (x < img->width - 1)
 				img->pixmap[x + 1][y] = img->pixmap[x + 1][y] + 7. / 16 * quantError;

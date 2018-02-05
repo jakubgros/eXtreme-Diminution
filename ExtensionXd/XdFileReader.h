@@ -25,9 +25,8 @@ public:
 	bool isCodeInDict(const std::string& str);
 	int getWordNumber(const std::string& str);
 	Rgb getColorFromPalette(int wordNumber);
-	void addToPixmap(const std::string& code, int x, int y);
 	void shiftIndexes(int& x, int& y);
-	void makeStepBack(std::string code, char& lastBit);
+	void makeStepBack(std::string& code, char& lastBit);
 	void initPixmap();
 	void readPixmap();
 	void read() override; 

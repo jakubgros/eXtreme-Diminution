@@ -151,9 +151,9 @@ std::bitset<64> FileBitStream::readBitset(size_t nOfBits)
 			throw std::exception("not enough data in stream");
 
 		if(bit)
-			temp|=1;
+			temp|=(1<<i);
 
-		temp<<=1;
+		//temp<<=1;
 	}
 
 	return temp;

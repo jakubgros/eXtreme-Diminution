@@ -1,6 +1,6 @@
 ﻿#include "XdFileReader.h"
 #include <string>
-
+#include <iostream>
 
 
 void XdFileReader::read()
@@ -52,6 +52,7 @@ void XdFileReader::readHeight()
 void XdFileReader::readColorMode()
 {
 	int mode=bitStream.read<int>(2);
+	std::cout << mode << std::endl;
 	img->colorMode=ColorMode(mode);
 }
 
@@ -88,7 +89,7 @@ void XdFileReader::readCode(Word& word, size_t codeLength)
 	std::bitset<64> codeWord=bitStream.readBitset(codeLength);
 	std::string strCodeWord=codeWord.to_string();
 
-	for(int i=0; i<codeWord.size(); ++i)
+	for(int i=codeWord.size()-codeLength; i<codeWord.size(); ++i)
 		word.codeWord.push_back(strCodeWord[i]);
 }
 
@@ -101,7 +102,7 @@ void XdFileReader::readWord(Word& word)
 
 void XdFileReader::readDictionary()
 {
-	int dictSize= bitStream.read<int>(6);
+	int dictSize= bitStream.read<int>(6)+1;
 
 	dictionary=new std::vector<Word>;
 	dictionary->resize(dictSize);
@@ -120,11 +121,11 @@ bool XdFileReader::isCodeInDict(const std::string& str)
 	return false;
 }
 
-int XdFileReader::getWordNumber(const std::string& str)
+int XdFileReader::getWordNumber(const std::string& code)
 {
 	for(int i=0; i<dictionary->size(); ++i)
 	{
-		if((*dictionary)[i].codeWord==str)
+		if((*dictionary)[i].codeWord==code)
 			return (*dictionary)[i].number;
 	}
 
@@ -134,11 +135,11 @@ int XdFileReader::getWordNumber(const std::string& str)
 Rgb XdFileReader::getColorFromPalette(int wordNumber)
 {
 	Palette* palette;
-	if(img->colorMode=ColorMode::GREY_SCALE)
+	if(img->colorMode==ColorMode::GREY_SCALE)
 		palette = &(img->imposedGreyPalette);
-	else if(img->colorMode=ColorMode::DEDICATED)
+	else if(img->colorMode==ColorMode::DEDICATED)
 		palette = &(img->dedicatedColorPalette);
-	else if(img->colorMode=ColorMode::IMPOSED)
+	else if(img->colorMode==ColorMode::IMPOSED)
 		palette = &(img->imposedColorPalette);
 	else
 		throw std::exception("error in getColorFromPalette");
@@ -146,12 +147,7 @@ Rgb XdFileReader::getColorFromPalette(int wordNumber)
 	return (*palette)[wordNumber];
 }
 
-void XdFileReader::addToPixmap(const std::string& code, int x, int y)
-{
-	int wordNumber=getWordNumber(code); //pobieram numer koloru ze slownika
-	Rgb pixel=getColorFromPalette(wordNumber);
-	img->pixmap[x][y] = pixel;
-}
+
 
 void XdFileReader::shiftIndexes(int& x, int& y)
 {
@@ -162,7 +158,7 @@ void XdFileReader::shiftIndexes(int& x, int& y)
 	}
 }
 
-void XdFileReader::makeStepBack(std::string code, char& lastBit)
+void XdFileReader::makeStepBack(std::string& code, char& lastBit)
 {
 	int lastPos=code.size()-1;
 	lastBit = code[lastPos];
@@ -180,8 +176,6 @@ void XdFileReader::readPixmap()
 {
 	initPixmap();
 
-	int x=0;
-	int y=0;
 	std::string code;
 	bool bit;
 	long long pixmapSize=img->height*img->width;
@@ -190,21 +184,11 @@ void XdFileReader::readPixmap()
 		bitStream.readBit(bit); //wczytuje bit
 		code+= bit?"1":"0"; //dodaje go do stringa
 
-		if(isCodeInDict(code)) //jak jest w slowniku
-			continue;
-		else // jak nie ma to cofam ostatni krok (ostatnio dodany bit) i dodaje do pixmapy
+		if (isCodeInDict(code))
 		{
-			shiftIndexes(x, y);
-
-			char lastBit;
-			makeStepBack(code, lastBit);
-
-			addToPixmap(code, x, y); // dodaje do pixmapy
-			code=lastBit; //ustawiam code na ostatnio wczytany bit(bo on juz nie nalezal do tego 
-
-			++x;
-		}
-			
+			img->compressedPixmap.push_back(code);
+			code = "";
+		}	
 	}
 }
 

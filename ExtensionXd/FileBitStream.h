@@ -37,17 +37,18 @@ public:
 template <typename T>
 void FileBitStream::write(T& data, size_t nOfBits)
 {
-	size_t counter=0;
+	size_t counter=nOfBits;
 	T tempData=data;
 	unsigned char* tempBuff=(unsigned char*)(&tempData);
 	const int BITS_IN_BYTE=8;
-	while(counter<nOfBits)
+	int nOfBytes = std::ceil(nOfBits / 8.)-1;
+	while(counter >0)
 	{
-		int shift=counter%8;
-		int bytesRead=sizeof(T)-counter/BITS_IN_BYTE -1;
+		int shift=(nOfBytes*8-counter)%8;
+		int bytesRead= std::ceil(counter / 8.)-1;
 		bool bit = tempBuff[bytesRead]<<shift & mostSignif;
 		writeBit(bit);
-		++counter;
+		--counter;
 	}
 }
 
