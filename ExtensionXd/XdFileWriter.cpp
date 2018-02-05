@@ -96,9 +96,8 @@ void XdFileWriter::writeWord(const Word& word)
 
 void XdFileWriter::writeWordsLength(const Word& word)
 {
-	int a=word.codeWord.length(); //TODO usunac
 	std::bitset<6> length(word.codeWord.length());
-	for(int i=0; i<length.size(); ++i)
+	for(int i=length.size()-1; i>=0; --i)
 		bitStream.writeBit(length[i]);
 }
 
