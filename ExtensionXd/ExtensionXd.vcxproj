@@ -28,8 +28,10 @@
     <ClInclude Include="Facade.h" />
     <ClInclude Include="FileBitStream.h" />
     <ClInclude Include="FileReader.h" />
+    <ClInclude Include="HuffmanTree.h" />
     <ClInclude Include="Loader.h" />
     <ClInclude Include="ObjectsCreator.h" />
+    <ClInclude Include="PixmapToStringConverter.h" />
     <ClInclude Include="Range.h" />
     <ClInclude Include="Saver.h" />
     <ClInclude Include="ToDedicatedPixmapConverter.h" />
@@ -55,9 +57,11 @@
     <ClCompile Include="Facade.cpp" />
     <ClCompile Include="FileBitStream.cpp" />
     <ClCompile Include="FileReader.cpp" />
+    <ClCompile Include="HuffmanTree.cpp" />
     <ClCompile Include="Loader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjectsCreator.cpp" />
+    <ClCompile Include="PixmapToStringConverter.cpp" />
     <ClCompile Include="Range.cpp" />
     <ClCompile Include="Saver.cpp" />
     <ClCompile Include="ToDedicatedPixmapConverter.cpp" />

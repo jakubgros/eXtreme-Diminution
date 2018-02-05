@@ -11,22 +11,26 @@ class FileBitStream
 	int bytesProcessed;
 	char openMode;
 	unsigned char mostSignif;
-
+	bool isBufferFull();
 	size_t fillBuffer();
+	void writeInBuffer(bool bit);
 public:
 	int getBytesProcessed() const {return bytesProcessed;}
 
 	bool flush();
 	void writeBit(bool bit);
-	void write(char c);
+	void write(unsigned char c);
 	template <typename T> void write(T& data, size_t nOfBits);
+
 	bool readBit(bool &bitRead); //returns false if eof, true if success. Read bit is assigned to bitRead
 	unsigned char readByte(); //throws exception if there is not enough data
 	template <typename toType> toType read(size_t nOfBits);
 	std::bitset<64> readBitset(size_t nOfBits);
+
+	void open(std::string filePath, char openMode);
+
 	explicit FileBitStream(std::string filePath, char openMode);
 	FileBitStream();
-	void open(std::string filePath, char openMode);
 	~FileBitStream();
 };
 
@@ -34,12 +38,14 @@ template <typename T>
 void FileBitStream::write(T& data, size_t nOfBits)
 {
 	size_t counter=0;
-	unsigned char* tempBuff=(unsigned char*)(&data);
+	T tempData=data;
+	unsigned char* tempBuff=(unsigned char*)(&tempData);
 	const int BITS_IN_BYTE=8;
-
 	while(counter<nOfBits)
 	{
-		int bit= tempBuff[counter%BITS_IN_BYTE]>>counter & 1;
+		int shift=counter%8;
+		int bytesRead=sizeof(T)-counter/BITS_IN_BYTE -1;
+		bool bit = tempBuff[bytesRead]<<shift & mostSignif;
 		writeBit(bit);
 		++counter;
 	}
@@ -57,10 +63,9 @@ toType FileBitStream::read(size_t nOfBits)
 		if(readBit(bit)==false)
 			throw std::exception("not enough data in stream");
 
+		temp<<=1;
 		if(bit)
 			temp|=1;
-
-		temp<<=1;
 	}
 
 	return temp;

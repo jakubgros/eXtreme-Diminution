@@ -1,6 +1,17 @@
 ﻿#include "XdFileReader.h"
 #include <string>
 
+
+
+void XdFileReader::read()
+{
+	readFileHeader();
+	readImgHeader();
+	readColorPalette();
+	readDictionary();
+	readPixmap();
+}
+
 XdFileReader::~XdFileReader()
 {
 	delete dictionary;
@@ -51,6 +62,14 @@ void XdFileReader::readImgHeader()
 	readColorMode();
 }
 
+void XdFileReader::readPixel(Rgb& p)
+{
+	const int BITS_IN_BYTE=8;
+	p.r=bitStream.read<int>(sizeof(p.r)*BITS_IN_BYTE);
+	p.g=bitStream.read<int>(sizeof(p.g)*BITS_IN_BYTE);
+	p.b=bitStream.read<int>(sizeof(p.b)*BITS_IN_BYTE);
+}
+
 void XdFileReader::readColorPalette()
 {
 	if(img->colorMode==ColorMode::IMPOSED)
@@ -59,12 +78,8 @@ void XdFileReader::readColorPalette()
 		return; //no need to write
 	else if(img->colorMode==ColorMode::DEDICATED)
 	{
-		for(auto & p : img->dedicatedColorPalette)
-		{
-			p.r=bitStream.read<int>(sizeof(p.r));
-			p.g=bitStream.read<int>(sizeof(p.g));
-			p.b=bitStream.read<int>(sizeof(p.b));
-		}
+		for(Rgb & p : img->dedicatedColorPalette)
+			readPixel(p);
 	}
 }
 
@@ -72,6 +87,7 @@ void XdFileReader::readCode(Word& word, size_t codeLength)
 {
 	std::bitset<64> codeWord=bitStream.readBitset(codeLength);
 	std::string strCodeWord=codeWord.to_string();
+
 	for(int i=0; i<codeWord.size(); ++i)
 		word.codeWord.push_back(strCodeWord[i]);
 }
@@ -86,6 +102,9 @@ void XdFileReader::readWord(Word& word)
 void XdFileReader::readDictionary()
 {
 	int dictSize= bitStream.read<int>(6);
+
+	dictionary=new std::vector<Word>;
+	dictionary->resize(dictSize);
 
 	for(int i=0; i < dictSize; ++i)
 		readWord((*dictionary)[i]);
@@ -134,11 +153,32 @@ void XdFileReader::addToPixmap(const std::string& code, int x, int y)
 	img->pixmap[x][y] = pixel;
 }
 
-void XdFileReader::readPixmap()
+void XdFileReader::shiftIndexes(int& x, int& y)
+{
+	if(x!=0 && x%img->width==0)
+	{
+		x=0;
+		++y;
+	}
+}
+
+void XdFileReader::makeStepBack(std::string code, char& lastBit)
+{
+	int lastPos=code.size()-1;
+	lastBit = code[lastPos];
+	code.erase(lastPos); 
+}
+
+void XdFileReader::initPixmap()
 {
 	img->pixmap.resize(img->width);
 	for(int i=0; i<img->width; ++i)
 		img->pixmap[i].resize(img->height);
+}
+
+void XdFileReader::readPixmap()
+{
+	initPixmap();
 
 	int x=0;
 	int y=0;
@@ -154,14 +194,10 @@ void XdFileReader::readPixmap()
 			continue;
 		else // jak nie ma to cofam ostatni krok (ostatnio dodany bit) i dodaje do pixmapy
 		{
-			if(x!=0 && x%img->width==0)
-			{
-				x=0;
-				++y;
-			}
-			int lastPos=code.size()-1; //pozycja ostatnio dodanego bitu
-			char lastBit=code[lastPos]; //zapisuje ostatni bit
-			code.erase(lastPos); //usuwam go
+			shiftIndexes(x, y);
+
+			char lastBit;
+			makeStepBack(code, lastBit);
 
 			addToPixmap(code, x, y); // dodaje do pixmapy
 			code=lastBit; //ustawiam code na ostatnio wczytany bit(bo on juz nie nalezal do tego 
@@ -172,14 +208,7 @@ void XdFileReader::readPixmap()
 	}
 }
 
-void XdFileReader::read()
-{
-	readFileHeader();
-	readImgHeader();
-	readColorPalette();
-	readDictionary();
-	readPixmap();
-}
+
 
 const Dictionary * XdFileReader::getDictionary()
 {

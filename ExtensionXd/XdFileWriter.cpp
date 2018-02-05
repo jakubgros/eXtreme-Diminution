@@ -96,6 +96,7 @@ void XdFileWriter::writeWord(const Word& word)
 
 void XdFileWriter::writeWordsLength(const Word& word)
 {
+	int a=word.codeWord.length(); //TODO usunac
 	std::bitset<6> length(word.codeWord.length());
 	for(int i=0; i<length.size(); ++i)
 		bitStream.writeBit(length[i]);
@@ -105,15 +106,7 @@ void XdFileWriter::writeCodeWord(const Word& word)
 {
 	std::bitset<63> codeWord(word.codeWord);
 
-	size_t mostSignificantDigitPos=0;
-	for(int i=63; i>=0; ++i)
-	{
-		if(codeWord.test(i)==true)
-		{
-			mostSignificantDigitPos=i;
-			break;
-		}
-	}
+	size_t mostSignificantDigitPos=findMostSignificantDigit(codeWord);
 	for(int i=0; i<=mostSignificantDigitPos; ++i)
 		bitStream.writeBit(codeWord[i]);
 }
@@ -127,6 +120,7 @@ void XdFileWriter::writePaletteIndex(const Word& word)
 
 void XdFileWriter::writePixmap()
 {
+	int a=img->compressedPixmap.size(); //TODO usunac
 	for(int i=0; i<img->compressedPixmap.size(); ++i)
 	{
 		std::string strCode=img->compressedPixmap[i];
@@ -139,7 +133,7 @@ void XdFileWriter::writePixmap()
 size_t XdFileWriter::findMostSignificantDigit(std::bitset<63>& bitCode)
 {
 	size_t mostSignificantDigitPos = 0;
-	for(int i=63; i>=0; ++i)
+	for(int i=bitCode.size()-1; i>=0; --i)
 	{
 		if(bitCode.test(i)==true)
 		{

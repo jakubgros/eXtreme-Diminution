@@ -3,7 +3,10 @@
 #include <iostream>
 
 UsersInterface::UsersInterface() :
-	inputPath("")
+	inputPath(""),
+	colorMode(0),
+	isInputLoaded(false)
+	
 {
 	
 }
@@ -16,7 +19,9 @@ void UsersInterface::printMsgToUser(std::string msg)
 std::string UsersInterface::loadInputPath()
 {
 	std::cout << "Wprowadz sciezke do pliku wejsciowego: ";
-	std::cin >> inputPath;
+	//std::cin >> inputPath;
+	inputPath="D:\\b.bmp"; //TODO: usunac to i odkomentowac powyzsze
+	isInputLoaded = true;
 	return inputPath;
 }
 
@@ -24,32 +29,51 @@ std::string UsersInterface::loadOuputPath()
 {
 	std::cout << "Wprowadz sciezke do pliku wyjsciowego: ";
 	std::string path;
-	std::cin >> path;
+	//std::cin >> path;
+	path="D:\\b.xd"; //TODO: usunac to i odkomentowac powyzsze
 	return path;
 }
 
 
 ColorMode UsersInterface::loadColorMode()
 {
-	std::cout 	<< "[0] skala szarości" << std::endl
-	<< "[1] dedykowana paleta" << std::endl
-	<< "[2] narzucona paleta" << std::endl
-	<< "Wybierz palete (podaj numer):";
-	unsigned int mode;
-	std::cin >> mode;
-	return ColorMode(mode);
+	if (isInputLoaded)
+	{
+		if (getInputExtension() == "bmp")
+			displayColorModeMenu();
+	}
+	else
+	{
+		displayColorModeMenu();
+		//std::cin >> colorMode;
+		colorMode=0; //TODO: usunac to i odkomentowac powyzsze
+	}
+
+	return ColorMode(colorMode);
 }
+
+void UsersInterface::displayColorModeMenu()
+{
+	std::cout << "[0] skala szarości" << std::endl
+		<< "[1] dedykowana paleta" << std::endl
+		<< "[2] narzucona paleta" << std::endl
+		<< "Wybierz palete (podaj numer):";
+
+}
+
 
 std::string UsersInterface::getInputExtension()
 {
-	std::string extension = "";
-	for (int i = inputPath.size() - 1; i >= 0; --i)
+	std::string inputExtension;
+	if (isInputLoaded)
 	{
-		if (inputPath[i] != '.')
-			extension += inputPath[i];
-		else
-			break;
+		for (size_t i = inputPath.size() - 1; i >= 0; --i)
+			if (inputPath[i] != '.')
+				inputExtension += inputPath[i];
+			else
+				break;
+		std::reverse(inputExtension.begin(), inputExtension.end());
 	}
-	std::reverse(extension.begin(), extension.end());
-	return extension;
+	return inputExtension;
 }
+

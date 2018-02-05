@@ -3,7 +3,7 @@
 
 
 ToGreyScalePixmapConverter::ToGreyScalePixmapConverter(ImgWithParam* imgWithParam) :
-	BmpToXdConverter(img)
+	BmpToXdConverter(imgWithParam)
 {
 
 }

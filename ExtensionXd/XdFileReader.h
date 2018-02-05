@@ -17,6 +17,7 @@ public:
 	void readHeight();
 	void readColorMode();
 	void readImgHeader();
+	void readPixel(Rgb& p);
 	void readColorPalette();
 	void readCode(Word& word, size_t codeLength);
 	void readWord(Word& word);
@@ -25,6 +26,9 @@ public:
 	int getWordNumber(const std::string& str);
 	Rgb getColorFromPalette(int wordNumber);
 	void addToPixmap(const std::string& code, int x, int y);
+	void shiftIndexes(int& x, int& y);
+	void makeStepBack(std::string code, char& lastBit);
+	void initPixmap();
 	void readPixmap();
 	void read() override; 
 	const Dictionary* getDictionary() override;

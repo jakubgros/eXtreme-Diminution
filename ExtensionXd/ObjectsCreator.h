@@ -20,9 +20,9 @@ enum FamilyType
  
 class ObjectCreator
 {
-	FamilyType type;
+	FamilyType loadedFileType;
 public:
-	explicit ObjectCreator(FamilyType type): type(type){};
+	explicit ObjectCreator(FamilyType type): loadedFileType(type){};
 
 	FileWriter* createFileWriter(const ImgWithParam* img);
 	Compressor* createCompressor(ImgWithParam* imgWithParam);

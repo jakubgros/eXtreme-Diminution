@@ -14,4 +14,8 @@ public:
 	std::string getInputExtension();
 private:
 	std::string inputPath;
+	unsigned int colorMode;
+	bool isInputLoaded;
+private:
+	void displayColorModeMenu();
 };

@@ -19,7 +19,7 @@ void Facade::fillImposedPalettes()
 
 
 	i = 0;
-	for (int j = 0; j < 255; j += 8)
+	for (int j = 0; j < 255; j += 4)
 	{
 		img->imposedGreyPalette[i] = { j, j, j };
 		++i;

@@ -19,47 +19,47 @@
 
 FileWriter* ObjectCreator::createFileWriter(const ImgWithParam* img)
 {
-	if(type==BMP)
+	if(loadedFileType==BMP)
 		return new XdFileWriter(img);
-	if(type==XD)
+	if(loadedFileType==XD)
 		return new BmpFileWriter(img);
 }
 
 Compressor* ObjectCreator::createCompressor(ImgWithParam* imgWithParam)
 {
-	if(type==BMP)
-		return new BmpCompressor(imgWithParam);
-	if(type==XD)
+	if(loadedFileType==BMP)
 		return new XdCompressor(imgWithParam);
+	if(loadedFileType==XD)
+		return new BmpCompressor(imgWithParam);
 }
 
 Validator* ObjectCreator::createValidator(ImgWithParam* imgWithParam)
 {
-	if(type==BMP)
+	if(loadedFileType==BMP)
 		return new BmpValidator(imgWithParam);
-	if(type==XD)
+	if(loadedFileType==XD)
 		return new XdValidator(imgWithParam);
 }
 
 FileReader* ObjectCreator::createFileReader(ImgWithParam* imgWithParam)
 {
-	if(type==BMP)
+	if(loadedFileType==BMP)
 		return new BmpFileReader(imgWithParam);
-	if(type==XD)
+	if(loadedFileType==XD)
 		return new XdFileReader(imgWithParam);
 }
 
 Decompressor* ObjectCreator::createDecompressor(ImgWithParam* imgWithParam)
 {
-	if(type==BMP)
+	if(loadedFileType==BMP)
 		return new BmpDecompressor(imgWithParam);
-	if(type==XD)
+	if(loadedFileType==XD)
 		return new XdDecompressor(imgWithParam);
 }
 
 Converter* ObjectCreator::createConverter(ImgWithParam* imgWithParam, ColorMode colorMode)
 {
-	if(type==BMP) //has loaded *.bmp file so it will be converted to xd extension
+	if(loadedFileType==BMP) //has loaded *.bmp file so it will be converted to xd extension
 	{
 		if(colorMode==DEDICATED)
 			return new ToDedicatedPixmapConverter(imgWithParam);
@@ -68,6 +68,6 @@ Converter* ObjectCreator::createConverter(ImgWithParam* imgWithParam, ColorMode 
 		if(colorMode==IMPOSED)
 			return new ToImposedPixmapConverter(imgWithParam);
 	}
-	if(type==XD)
+	if(loadedFileType==XD)
 		return new XdToBmpConverter(imgWithParam, colorMode);
 }
