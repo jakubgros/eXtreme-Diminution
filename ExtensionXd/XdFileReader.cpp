@@ -84,6 +84,8 @@ void XdFileReader::readColorPalette()
 	}
 }
 
+
+//TODO: sprawdzic bitsety w readerze czy nie wczytuja sie od tylu albo zle, we writerach juz sa ponaprawiane
 void XdFileReader::readCode(Word& word, size_t codeLength)
 {
 	std::bitset<64> codeWord=bitStream.readBitset(codeLength);
@@ -179,7 +181,8 @@ void XdFileReader::readPixmap()
 	std::string code;
 	bool bit;
 	long long pixmapSize=img->height*img->width;
-	for(int i=0; i<pixmapSize; ++i)
+	int counter = 0;
+	while(counter < pixmapSize)
 	{
 		bitStream.readBit(bit); //wczytuje bit
 		code+= bit?"1":"0"; //dodaje go do stringa
@@ -187,6 +190,7 @@ void XdFileReader::readPixmap()
 		if (isCodeInDict(code))
 		{
 			img->compressedPixmap.push_back(code);
+			++counter;
 			code = "";
 		}	
 	}
@@ -198,4 +202,3 @@ const Dictionary * XdFileReader::getDictionary()
 {
 	return dictionary;
 }
-

@@ -22,19 +22,21 @@ void XdDecompressor::decompress(const Dictionary* dictionary)
 		{
 			if (img->compressedPixmap[i] == (*dictionary)[j].codeWord)
 			{
+				int x = i%img->width;
+				int y = i / (img->width);
+
 				switch (img->colorMode)
 				{
 				case IMPOSED:
-					img->pixmap[i%img->width][i / (img->width)] = img->imposedColorPalette[(*dictionary)[j].number];
+					img->pixmap[x][y] = img->imposedColorPalette[(*dictionary)[j].number];
 					break;
 				case DEDICATED:
-					img->pixmap[i%img->width][i / (img->width)] = img->dedicatedColorPalette[(*dictionary)[j].number];
+					img->pixmap[x][y] = img->dedicatedColorPalette[(*dictionary)[j].number];
 					break;
 				case GREY_SCALE:
-					img->pixmap[i%img->width][i / (img->width)] = img->imposedGreyPalette[(*dictionary)[j].number];
+					img->pixmap[x][y] = img->imposedGreyPalette[(*dictionary)[j].number];
 					break;
 				}
-				//std::cout << static_cast<int>((*dictionary)[j].number) << " ";
 				break;
 			}
 		}

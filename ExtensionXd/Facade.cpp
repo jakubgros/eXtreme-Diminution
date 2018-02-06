@@ -5,6 +5,17 @@
 #include "Saver.h"
 #include "Display.h"
 
+void Facade::run()
+{
+	getInfoFromUser();
+	makeCreator();
+	load();
+	convert();
+	if(img->fileType=="xd")
+		printImg();
+	save();
+}
+
 void Facade::fillImposedPalettes()
 {
 	int i = 0;
@@ -89,16 +100,6 @@ void Facade::save()
 	*/
 }
 
-void Facade::run()
-{
-	getInfoFromUser();
-	makeCreator();
-	load();
-	convert();
-	if(img->fileType=="xd")
-		printImg();
-	save();
-}
 
 
 

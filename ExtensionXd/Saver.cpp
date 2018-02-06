@@ -22,3 +22,4 @@ bool Saver::save()
 	return fileWriter->write();
 }
 
+//bug: dla obrazka 5x5 całego czarnego w słowniku jest jeden element, dla którego codeWord jest pusty

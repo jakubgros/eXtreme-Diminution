@@ -107,14 +107,14 @@ void XdFileWriter::writeCodeWord(const Word& word)
 
 	size_t mostSignificantDigitPos = mostSignificantDigitPos=word.codeWord.length()-1;
 
-	for (int i = 0; i <= mostSignificantDigitPos; ++i)
+	for (int i = mostSignificantDigitPos; i >=0; --i)
 		bitStream.writeBit(bitSetCodeWord[i]);
 }
 
 void XdFileWriter::writePaletteIndex(const Word& word)
 {
 	std::bitset<6> number(word.number);
-	for (int i = 0; i<number.size(); ++i)
+	for (int i = number.size()-1; i>=0; --i)
 		bitStream.writeBit(number[i]);
 }
 
@@ -131,6 +131,6 @@ void XdFileWriter::writePixmap()
 
 void XdFileWriter::writeSinglePixel(std::bitset<63> bitCode, size_t mostSignificantDigitPos)
 {
-	for (int i = 0; i <= mostSignificantDigitPos; ++i)
+	for (int i = mostSignificantDigitPos; i >= 0; --i)
 		bitStream.writeBit(bitCode[i]);
 }
