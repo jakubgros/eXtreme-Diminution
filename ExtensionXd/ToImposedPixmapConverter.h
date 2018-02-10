@@ -7,12 +7,10 @@ class ToImposedPixmapConverter : public BmpToXdConverter
 {
 public:
 	explicit ToImposedPixmapConverter(ImgWithParam* imgWithParam);
-	virtual ~ToImposedPixmapConverter() = default;
-	virtual void convert() override;
+	~ToImposedPixmapConverter() = default;
+	void convert();
 private:
-	Rgb findClosestPaletteColor(Rgb pixel);
-	double countDistance(Rgb pixel1, Rgb pixel2);
-private:
+	void checkResources() const;
 	ToImposedPixmapConverter(const ToImposedPixmapConverter&);
 	ToImposedPixmapConverter& operator=(const ToImposedPixmapConverter&);
 };

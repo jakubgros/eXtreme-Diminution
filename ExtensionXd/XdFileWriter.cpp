@@ -22,6 +22,8 @@ bool XdFileWriter::write()
 	return true; //TODO: reimplement function so as to it returned false if it wants to overwrite a file
 }
 
+//TODO: w specyfikacji przy rozmiarze s³ownika napisaæ ¿e zapisywany jest rozmiar-1
+
 void XdFileWriter::writeFileHeader()
 {
 	writeFileType();
@@ -57,13 +59,13 @@ void XdFileWriter::wirteColorPalette()
 	else if (img->colorMode == ColorMode::DEDICATED)
 		palette = img->dedicatedColorPalette;
 
-
+	const int BITS_IN_BYTE=8;
 
 	for (int i = 0; i<palette.size(); ++i)
 	{
-		bitStream.write(palette[i].r, sizeof(palette[i].r));
-		bitStream.write(palette[i].g, sizeof(palette[i].g));
-		bitStream.write(palette[i].b, sizeof(palette[i].b));
+		bitStream.write(palette[i].r, sizeof(palette[i].r)*BITS_IN_BYTE);
+		bitStream.write(palette[i].g, sizeof(palette[i].g)*BITS_IN_BYTE);
+		bitStream.write(palette[i].b, sizeof(palette[i].b)*BITS_IN_BYTE);
 	}
 
 }

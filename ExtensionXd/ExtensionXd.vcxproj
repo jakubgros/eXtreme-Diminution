@@ -25,6 +25,7 @@
     <ClInclude Include="Converter.h" />
     <ClInclude Include="Decompressor.h" />
     <ClInclude Include="Display.h" />
+    <ClInclude Include="DitheringFS.h" />
     <ClInclude Include="Facade.h" />
     <ClInclude Include="FileBitStream.h" />
     <ClInclude Include="FileReader.h" />
@@ -33,6 +34,7 @@
     <ClInclude Include="ObjectsCreator.h" />
     <ClInclude Include="PixmapToStringConverter.h" />
     <ClInclude Include="Range.h" />
+    <ClInclude Include="RangeSort.h" />
     <ClInclude Include="Saver.h" />
     <ClInclude Include="ToDedicatedPixmapConverter.h" />
     <ClInclude Include="ToGreyScalePixmapConverter.h" />
@@ -54,6 +56,7 @@
     <ClCompile Include="Converter.cpp" />
     <ClCompile Include="Decompressor.cpp" />
     <ClCompile Include="Display.cpp" />
+    <ClCompile Include="DitheringFS.cpp" />
     <ClCompile Include="Facade.cpp" />
     <ClCompile Include="FileBitStream.cpp" />
     <ClCompile Include="FileReader.cpp" />
@@ -63,6 +66,7 @@
     <ClCompile Include="ObjectsCreator.cpp" />
     <ClCompile Include="PixmapToStringConverter.cpp" />
     <ClCompile Include="Range.cpp" />
+    <ClCompile Include="RangeSort.cpp" />
     <ClCompile Include="Saver.cpp" />
     <ClCompile Include="ToDedicatedPixmapConverter.cpp" />
     <ClCompile Include="ToGreyScalePixmapConverter.cpp" />

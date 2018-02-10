@@ -52,28 +52,27 @@ struct ImgWithParam
 	std::vector<std::string> compressedPixmap;
 };
 
-struct bitmap_file_header
+struct BmpFileHeader
 {
-	unsigned char   bitmap_type[2];
-	int             fileSize;
-	short           reserved1;
-	short           reserved2;
-	unsigned int    offsetBits;
+	unsigned char bitmapType[2];
+	unsigned int fileSize;
+	int reserved;
+	unsigned int offsetBits;
 };
 
-struct bitmap_image_header
+struct BmpImageHeader
 {
-	unsigned int    sizeHeader;
-	unsigned int    width;
-	unsigned int    height;
-	short int       planes;
-	short int       bitCount;
-	unsigned int    compression;
-	unsigned int    imageSize;
-	unsigned int    ppmX;
-	unsigned int    ppmY;
-	unsigned int    clrUsed;
-	unsigned int    clrImportant;
+	unsigned bitmapInfoHeader;
+	unsigned width;
+	unsigned height;
+	short planes;
+	short bitCount;
+	unsigned compression;
+	unsigned imageSize;
+	unsigned horizontalRes;
+	unsigned verticalRes;
+	unsigned clrUsed;
+	unsigned clrImportant;
 };
 
 Rgb operator+ (const Rgb &left, const Rgb& right);

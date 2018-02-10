@@ -1,7 +1,7 @@
 #include "ToGreyScalePixmapConverter.h"
 #include "Types.h"
 #include <iostream>
-
+#include "DitheringFS.h"
 
 ToGreyScalePixmapConverter::ToGreyScalePixmapConverter(ImgWithParam* imgWithParam) :
 	BmpToXdConverter(imgWithParam)
@@ -11,55 +11,44 @@ ToGreyScalePixmapConverter::ToGreyScalePixmapConverter(ImgWithParam* imgWithPara
 
 void ToGreyScalePixmapConverter::convert()
 {
-	for (int y = 0; y < img->height; ++y)
-	{
-		for (int x = 0; x < img->width; ++x)
-		{
-			Rgb oldPixel = img->pixmap[x][y];
-			oldPixel = colorToYUV(oldPixel);
-			Rgb newPixel = findClosestPaletteColor(oldPixel);
-			img->pixmap[x][y] = newPixel;
-		//	std::cout << img->pixmap[x][y].r << " " << img->pixmap[x][y].g << " " << img->pixmap[x][y].b << std::endl;
-			Rgb quantError = oldPixel - newPixel;
-			if (x < img->width - 1)
-				img->pixmap[x + 1][y] = img->pixmap[x + 1][y] + 7. / 16 * quantError;
-			if (x > 0 && y < img->height - 1)
-				img->pixmap[x - 1][y + 1] = img->pixmap[x - 1][y + 1] + 3. / 16 * quantError;
-			if (y < img->height - 1)
-				img->pixmap[x][y + 1] = img->pixmap[x][y + 1] + 5. / 16 * quantError;
-			if (x < img->width - 1 && y < img->height - 1)
-				img->pixmap[x + 1][y + 1] = img->pixmap[x + 1][y + 1] + 1. / 16 * quantError;
-		}
-	}
+	checkResources();
+	dfs::ditheringFs(&img->pixmap, &img->imposedGreyPalette, findClosestPaletteColor);
 }
 
-Rgb ToGreyScalePixmapConverter::colorToYUV(Rgb pixel)
+void ToGreyScalePixmapConverter::checkResources() const
 {
-	int newColor = pixel.r*0.299 + pixel.g*0.587 + pixel.b*0.114;
-	pixel.r = pixel.g = pixel.b = newColor;
-	return pixel;
+	if (img == nullptr)
+		throw std::logic_error("ToGreyScalePixmapConverter - nullptr resources");
 }
 
-
-Rgb ToGreyScalePixmapConverter::findClosestPaletteColor(Rgb pixel)
+Rgb ToGreyScalePixmapConverter::findClosestPaletteColor(const Rgb& color)
 {
-	switch (pixel.r % 4)
+	Rgb newColor = rgbToYuv(color);
+	switch (newColor.r % 4)
 	{
 	case 0:
 		break;
 	case 1:
-		pixel = pixel - Rgb { 1,1,1 };
+		newColor = newColor - Rgb{ 1,1,1 };
 		break;
 	case 2:
-		pixel = pixel - Rgb{ 2,2,2 };
+		newColor = newColor - Rgb{ 2,2,2 };
 		break;
 	case 3:
-		if (pixel.r == 255)
-			pixel = Rgb{ 252, 252, 252 };
+		if (newColor.r == 255)
+			newColor = Rgb{ 252, 252, 252 };
 		else
-			pixel = pixel + Rgb{ 1,1,1 };
+			newColor = newColor + Rgb{ 1,1,1 };
+		break;
+	default:
 		break;
 	}
-	return pixel;
+	return newColor;
 }
 
+Rgb ToGreyScalePixmapConverter::rgbToYuv(Rgb pixel)
+{
+	const int newColor = pixel.r*0.299 + pixel.g*0.587 + pixel.b*0.114;
+	pixel.r = pixel.g = pixel.b = newColor;
+	return pixel;
+}

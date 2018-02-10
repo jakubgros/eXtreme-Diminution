@@ -1,97 +1,50 @@
 #include "ToDedicatedPixmapConverter.h"
 #include "Types.h"
+#include "DitheringFS.h"
+#include "RangeSort.h"
 #include <iostream>
 
 ToDedicatedPixmapConverter::ToDedicatedPixmapConverter(ImgWithParam* img) :
-	BmpToXdConverter(img)
+	BmpToXdConverter(img),
+	pixmap()
 {
 
-}
-
-bool compareR(Rgb a, Rgb b)
-{
-	return a.r < b.r;
-}
-bool compareG(Rgb a, Rgb b)
-{
-	return a.g < b.g;
-}
-bool compareB(Rgb a, Rgb b)
-{
-	return a.b < b.b;
 }
 
 void ToDedicatedPixmapConverter::convert()
 {
 	createPixmap();
 	findPalette();
-	dithering();
+	dfs::ditheringFs(&img->pixmap, &img->dedicatedColorPalette);
 }
 
 void  ToDedicatedPixmapConverter::createPixmap()
 {
-	for (int y = 0; y < img->height; ++y)
-		for (int x = 0; x < img->width; ++x)
+	for (size_t y = 0; y < img->height; ++y)
+		for (size_t x = 0; x < img->width; ++x)
 			pixmap.push_back(img->pixmap[x][y]);
 }
 
 void ToDedicatedPixmapConverter::findPalette()
 {
-	sortBuckets(0, pixmap.size() - 1);
+	createSortedPixmap();
 	findNewColors();
 }
 
-void ToDedicatedPixmapConverter::sortBuckets(const int left,const int right)
+void ToDedicatedPixmapConverter::createSortedPixmap()
 {
-	findRanges(left, right);
-	if (rRange == std::max(rRange, std::max(bRange, gRange)))
-		std::sort(pixmap.begin() + left, pixmap.begin() + right + 1, compareR);
-	else
-		if (gRange == std::max(gRange, bRange))
-			std::sort(pixmap.begin() + left, pixmap.begin() + right + 1, compareG);
-		else
-			std::sort(pixmap.begin() + left, pixmap.begin() + right + 1, compareB);
-	if (!isLastPartition(left, right))
-		sortBuckets(left, left + (right - left) / 2);
-	if (!isLastPartition(left, right))
-		sortBuckets(left + (right - left) / 2 + 1, right);
+	RangeSort rs(&img->pixmap, img->dedicatedColorPalette.size());
+	pixmap = rs.sort();
 }
 
-void ToDedicatedPixmapConverter::findRanges(const int left, const int right)
-{
-	initRanges(left);
-	for (int i = left; i <= right; ++i)
-		updateRanges(i);
-}
-
-
-bool ToDedicatedPixmapConverter::isLastPartition(const int left, const int right)
-{
-	return (right - left <= img->height*img->width / img->dedicatedColorPalette.size());
-}
-
-void ToDedicatedPixmapConverter::initRanges(const int index)
-{
-	rRange.setMin(pixmap[index].r);
-	rRange.setMax(pixmap[index].r);
-	gRange.setMin(pixmap[index].g);
-	gRange.setMax(pixmap[index].g);
-	bRange.setMin(pixmap[index].b);
-	bRange.setMax(pixmap[index].b);
-}
-
-void ToDedicatedPixmapConverter::updateRanges(const int index)
-{
-	rRange.update(pixmap[index].r);
-	gRange.update(pixmap[index].g);
-	bRange.update(pixmap[index].b);
-}
 
 void ToDedicatedPixmapConverter::findNewColors()
 {
-	int step = pixmap.size() / img->dedicatedColorPalette.size();
-	int numOfCols = 0;
-	for (int i = 0; i < pixmap.size(); i += step)
+	const int step = pixmap.size() / img->dedicatedColorPalette.size();
+	unsigned numOfCols = 0;
+	//	for (size_t i = 0; i < pixmap.size(); ++i)
+	//		std::cout << i << "| " << i%step << " | R: " << pixmap[i].r << " G:" << pixmap[i].g << " B:" << pixmap[i].b << std::endl;
+	for (size_t i = 0; i < pixmap.size(); i += step)
 	{
 		if (numOfCols < img->dedicatedColorPalette.size())
 		{
@@ -102,21 +55,23 @@ void ToDedicatedPixmapConverter::findNewColors()
 			for (j = i; j < i + step; ++j)
 			{
 				Lab lab;
-				RGB2LAB(pixmap[j].r, pixmap[j].g, pixmap[j].b, &lab.l, &lab.a, &lab.b);
+				rgb2Lab(pixmap[j].r, pixmap[j].g, pixmap[j].b, &lab.l, &lab.a, &lab.b);
 				sumL += lab.l;
 				sumA += lab.a;
 				sumB += lab.b;
 			}
 			Lab avarage = { sumL / (step), sumA / (step), sumB / (step) };
 			Rgb newColor;
-			LAB2RGB(avarage.l, avarage.a, avarage.b, &newColor.r, &newColor.g, &newColor.b);
+			lab2Rgb(avarage.l, avarage.a, avarage.b, &newColor.r, &newColor.g, &newColor.b);
 			img->dedicatedColorPalette[numOfCols] = newColor;
 			++numOfCols;
+			//			std::cout << "< " << i << " , " << j-1 << " >" << std::endl;
 		}
 	}
 }
 
-void ToDedicatedPixmapConverter::RGB2LAB(int R, int G, int B, double *l, double *a, double *b) {
+void ToDedicatedPixmapConverter::rgb2Lab(int R, int G, int B, double *l, double *a, double *b)
+{
 	float RGB[3], XYZ[3];
 
 	RGB[0] = R * 0.003922;
@@ -136,7 +91,8 @@ void ToDedicatedPixmapConverter::RGB2LAB(int R, int G, int B, double *l, double 
 	*b = 200 * (((XYZ[1] / 1.000000) > 0.008856 ? pow(XYZ[1] / 1.000000, 0.333333) : 7.787 * XYZ[1] / 1.000000 + 0.137931) - ((XYZ[2] / 1.088969) > 0.008856 ? pow(XYZ[2] / 1.088969, 0.333333) : 7.787 * XYZ[2] / 1.088969 + 0.137931));
 }
 
-void ToDedicatedPixmapConverter::LAB2RGB(double L, double A, double B, int *r, int *g, int *b) {
+void ToDedicatedPixmapConverter::lab2Rgb(double L, double A, double B, int *r, int *g, int *b)
+{
 	float XYZ[3], RGB[3];
 
 	XYZ[1] = (L + 16) / 116;
@@ -154,47 +110,4 @@ void ToDedicatedPixmapConverter::LAB2RGB(double L, double A, double B, int *r, i
 	*r = (255 * ((RGB[0] > 0.0031308) ? 1.055 * (pow(RGB[0], (1 / 2.4)) - 0.055) : RGB[0] * 12.92));
 	*g = (255 * ((RGB[1] > 0.0031308) ? 1.055 * (pow(RGB[1], (1 / 2.4)) - 0.055) : RGB[1] * 12.92));
 	*b = (255 * ((RGB[2] > 0.0031308) ? 1.055 * (pow(RGB[2], (1 / 2.4)) - 0.055) : RGB[2] * 12.92));
-}
-
-void ToDedicatedPixmapConverter::dithering()
-{
-	for (int y = 0; y < img->height; ++y)
-	{
-		for (int x = 0; x < img->width; ++x)
-		{
-			Rgb oldPixel = img->pixmap[x][y];
-			Rgb newPixel = findClosestPaletteColor(oldPixel);
-			img->pixmap[x][y] = newPixel;
-			Rgb quantError = oldPixel - newPixel;
-			if (x < img->width - 1)
-				img->pixmap[x + 1][y] = img->pixmap[x + 1][y] + 7. / 16 * quantError;
-			if (x > 0 && y < img->height - 1)
-				img->pixmap[x - 1][y + 1] = img->pixmap[x - 1][y + 1] + 3. / 16 * quantError;
-			if (y < img->height - 1)
-				img->pixmap[x][y + 1] = img->pixmap[x][y + 1] + 5. / 16 * quantError;
-			if (x < img->width - 1 && y < img->height - 1)
-				img->pixmap[x + 1][y + 1] = img->pixmap[x + 1][y + 1] + 1. / 16 * quantError;
-		}
-	}
-}
-
-Rgb ToDedicatedPixmapConverter::findClosestPaletteColor(Rgb pixel)
-{
-	double bestDistance = countDistance(pixel, img->dedicatedColorPalette[0]);
-	int bestColor = 0;
-	double currentDistance = 0;
-	for (int i = 1; i < img->dedicatedColorPalette.size(); ++i)
-	{
-		currentDistance = countDistance(pixel, img->dedicatedColorPalette[i]);
-		if (currentDistance < bestDistance)
-			bestColor = i;
-	}
-	return  img->dedicatedColorPalette[bestColor];
-}
-
-double ToDedicatedPixmapConverter::countDistance(Rgb pixel1, Rgb pixel2)
-{
-	return pow((pixel1.r - pixel2.r)*0.299, 2)
-		+ pow((pixel1.g - pixel2.g)*0.587, 2)
-		+ pow((pixel1.b - pixel2.b)*0.114, 2);
 }

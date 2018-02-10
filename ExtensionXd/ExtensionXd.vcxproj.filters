@@ -96,6 +96,12 @@
     <ClInclude Include="PixmapToStringConverter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DitheringFS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RangeSort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UsersInterface.cpp">
@@ -180,6 +186,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PixmapToStringConverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DitheringFS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RangeSort.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
