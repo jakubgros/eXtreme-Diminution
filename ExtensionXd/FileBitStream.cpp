@@ -2,12 +2,30 @@
 #include <bitset>
 #include <iostream>
 
-	static std::string inFile;//TODO usunac
-size_t FileBitStream::fillBuffer()
+
+void FileBitStream::write(unsigned char c)
 {
-	bitCounter=fread(&buffer, sizeof(unsigned char), 1, file)*BITS_IN_BYTE;
-	++bytesProcessed;
-	return bitCounter;
+	int bitsToWrite=sizeof(unsigned char)*BITS_IN_BYTE;
+
+	for(int i=0; i<bitsToWrite; ++i)
+	{
+		bool bit=c & mostSignif;
+		writeBit(bit);
+		c<<=1;
+	}
+}
+
+void FileBitStream::writeBit(bool bit)
+{
+	if(isBufferFull())
+		flush();
+
+	writeInBuffer(bit);
+}
+
+bool FileBitStream::isBufferFull()
+{
+	return bitCounter == sizeof(buffer) * BITS_IN_BYTE;
 }
 
 bool FileBitStream::flush()
@@ -16,52 +34,23 @@ bool FileBitStream::flush()
 		return false;
 	else
 	{
-
-		fwrite(&buffer, sizeof(unsigned char), sizeof(buffer), file);
-
+		fwrite(&buffer, sizeof(unsigned char), 1, file);
 		++bytesProcessed;
 		bitCounter=0;
 		return true;
 	}
 }
 
-bool FileBitStream::isBufferFull()
-{
-	return bitCounter == sizeof(buffer) * BITS_IN_BYTE;
-}
-
 void FileBitStream::writeInBuffer(bool bit)
 {
 	buffer <<=1; //shift to make space
 	if(bit==1)
-		buffer |=1; //set bit
+		buffer |=1; //set bit, default set to 0
 	++bitCounter;
 }
 
-void FileBitStream::writeBit(bool bit)
-{
 
 
-	inFile+= std::to_string(bit); //TODO usunac
-
-	writeInBuffer(bit);
-
-	if(isBufferFull())
-		flush();
-}
-
-void FileBitStream::write(unsigned char c)
-{
-
-	int counter=sizeof(unsigned char)*BITS_IN_BYTE;
-	while(counter>0)
-	{
-		bool bit=c & mostSignif;
-		writeBit(bit);
-		--counter;
-		c<<=1;
-	}
-}
 
 bool FileBitStream::readBit(bool &bitRead)
 {
@@ -80,12 +69,6 @@ bool FileBitStream::readBit(bool &bitRead)
 	return true; //not eof
 }
 
-FileBitStream::FileBitStream()
-{
-	mostSignif|=1;
-	mostSignif<<=sizeof(mostSignif)*BITS_IN_BYTE-1;
-}
-
 unsigned char FileBitStream::readByte()
 {
 	bool bit;
@@ -93,16 +76,48 @@ unsigned char FileBitStream::readByte()
 	for(int i=0; i<BITS_IN_BYTE; ++i)
 	{
 		if(readBit(bit)==false)
-			throw std::exception("Not enough data to read a byte.");
+			throw std::exception("Not enough data to read a byte. ");
 		else
 		{
 			byte<<=1;
+
 			if(bit==true)
 				byte|=1;
 		}
 	}
 	return byte;
 }
+
+std::bitset<64> FileBitStream::readBitset(size_t nOfBits)
+{
+	std::bitset<64> temp;
+
+	temp.reset();
+
+	for(int i=0; i<nOfBits; ++i)
+	{
+		bool bit;
+
+		if(readBit(bit)==false)
+			throw std::exception("not enough data in stream");
+
+		temp<<=1;
+		if(bit==true)
+			temp|=1;
+	}
+
+	return temp;
+}
+
+size_t FileBitStream::fillBuffer()
+{
+	bitCounter=fread(&buffer, sizeof(unsigned char), 1, file)*BITS_IN_BYTE;
+	++bytesProcessed;
+	return bitCounter;
+}
+
+
+
 
 FileBitStream::FileBitStream(std::string filePath, char openMode)
 {
@@ -112,7 +127,7 @@ FileBitStream::FileBitStream(std::string filePath, char openMode)
 void FileBitStream::open(std::string filePath, char mode)
 {
 	openMode=mode;
-	buffer<<=sizeof(buffer)*BITS_IN_BYTE; //clean buffer
+	buffer=0; //clean buffer
 	bitCounter=0;
 
 	char* fopenMode;
@@ -137,26 +152,8 @@ FileBitStream::~FileBitStream()
 	fclose(file);
 }
 
-std::bitset<64> FileBitStream::readBitset(size_t nOfBits)
+FileBitStream::FileBitStream()
 {
-	std::bitset<64> temp;
-
-	temp.reset();
-
-	for(int i=0; i<nOfBits; ++i)
-	{
-		bool bit;
-
-		if(readBit(bit)==false)
-			throw std::exception("not enough data in stream");
-
-		if(bit)
-			temp|=(1<<i);
-
-		//temp<<=1;
-	}
-
-	return temp;
+	mostSignif|=1;
+	mostSignif<<=sizeof(mostSignif)*BITS_IN_BYTE-1;
 }
-
-

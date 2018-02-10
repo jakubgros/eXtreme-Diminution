@@ -9,13 +9,28 @@ public:
 	explicit BmpFileWriter(const ImgWithParam* img);
 	bool write();
 private:
-	const ImgWithParam* img;
+	static const unsigned bfhSize = 14;
+	static const unsigned bihSize = 40;
+	static const unsigned fileSizeOffset = 2;
+	static const unsigned pixmapOffset = 34;
+
 	std::vector<uint8_t> data;
-	size_t fileSizeOffset;
-	size_t pixmapOffset;
+	uint8_t* outputDataSeries;
+	std::ofstream file;
 	BmpFileHeader bfh;
+	BmpImageHeader bih;
 private:
-	void addFileHeader();
-	void writePixmap();
-	size_t encodeRgb(uint8_t** output);
+	void init();
+	void initFileHeader();
+	void initImageHeader();
+	void createOutputData();
+	void createOutputDataSeries();
+	void writeBmp();
+	template<typename T>
+	void putBytes(const unsigned nOfBytes, const T& source);
+	void putPixmap();
+	void putBGR(const int x, const int y);
+	void putPadding();
+	void updateFileSize();
+	void updatePixmapSize();
 };

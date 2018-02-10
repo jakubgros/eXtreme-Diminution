@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <bitset>
+#include <functional>
 
 class FileBitStream
 {
@@ -34,6 +35,8 @@ public:
 	~FileBitStream();
 };
 
+
+
 template <typename T>
 void FileBitStream::write(T& data, size_t nOfBits)
 {
@@ -41,20 +44,37 @@ void FileBitStream::write(T& data, size_t nOfBits)
 	T tempData=data;
 	unsigned char* tempBuff=(unsigned char*)(&tempData);
 	const int BITS_IN_BYTE=8;
-	int nOfBytes = std::ceil(nOfBits / 8.)-1;
-	while(counter >0)
+	std::vector<bool> dataInBinary;
+	dataInBinary.resize(nOfBits);
+
+	int bitsWritten=0;
+	int shift=0;
+	int bytes=0;
+
+	while(bitsWritten < nOfBits)
 	{
-		int shift=(nOfBytes*8-counter)%8;
-		int bytesRead= std::ceil(counter / 8.)-1;
-		bool bit = tempBuff[bytesRead]<<shift & mostSignif;
-		writeBit(bit);
-		--counter;
+		dataInBinary[bitsWritten]=tempBuff[bytes]>>shift & 1;
+		++bitsWritten;
+
+		if(bitsWritten % BITS_IN_BYTE == 0)
+		{
+			++bytes;
+			shift=0;
+		}
+		else
+			++shift;
 	}
+	
+	for(int i=dataInBinary.size()-1; i>=0; --i)
+			writeBit(dataInBinary[i]);
 }
 
 template <typename toType>
 toType FileBitStream::read(size_t nOfBits)
 {
+	if(sizeof(toType)*BITS_IN_BYTE<nOfBits)
+		std::exception("not enough space to fit read data");
+
 	toType temp=0;
 
 	for(int i=0; i<nOfBits; ++i)
