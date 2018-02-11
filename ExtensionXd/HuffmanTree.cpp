@@ -31,7 +31,7 @@ void HuffmanTree::run()
 	pixmap = ptsc.convert();
 	makeList();
 	makeTree();
-	createDictionary(root, "");
+	createDictionary(root, "0");
 //	std::cout << "compressed" << std::endl;
 //	compress();
 //	decompress();
@@ -160,6 +160,8 @@ void HuffmanTree::compress()
 				img->compressedPixmap.push_back((*dictionary)[color].codeWord);
 				//std::cout << (*dictionary)[color].codeWord << " ";
 			}
+			else 
+				throw std::exception("invalid pixmap");
 		}
 	}
 }

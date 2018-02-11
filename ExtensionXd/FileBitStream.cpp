@@ -39,18 +39,27 @@ bool FileBitStream::flush()
 		bitCounter=0;
 		return true;
 	}
+
+
 }
 
 void FileBitStream::writeInBuffer(bool bit)
 {
-	buffer <<=1; //shift to make space
+	static int position=7;
+
+	if(position<0)
+	{
+		position=7;
+		buffer=0;
+	}
+		
+
 	if(bit==1)
-		buffer |=1; //set bit, default set to 0
+		buffer |= 1<<position; //set bit
+
+	--position;
 	++bitCounter;
 }
-
-
-
 
 bool FileBitStream::readBit(bool &bitRead)
 {
@@ -115,9 +124,6 @@ size_t FileBitStream::fillBuffer()
 	++bytesProcessed;
 	return bitCounter;
 }
-
-
-
 
 FileBitStream::FileBitStream(std::string filePath, char openMode)
 {

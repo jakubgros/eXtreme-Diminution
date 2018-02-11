@@ -96,7 +96,7 @@ void XdFileReader::readCode(Word& word, size_t codeLength)
 	std::bitset<64> codeWord=bitStream.readBitset(codeLength);
 	std::string strCodeWord=codeWord.to_string();
 
-	for(int i=codeLength-1; i>=0; --i)
+	for(int i=64 - codeLength; i<64; ++i)
 		word.codeWord.push_back(strCodeWord[i]);
 }
 
@@ -110,8 +110,10 @@ void XdFileReader::readPixmap()
 	int added = 0;
 	while(added < pixmapSize)
 	{
-		bitStream.readBit(bit); //wczytuje bit
-		code+= bit?"1":"0"; //dodaje go do stringa
+		if(bitStream.readBit(bit)==false)
+			throw std::exception("Can't read bit. There is no more data in stream.");
+
+		code+= bit?"1":"0";
 
 		if (isCodeInDict(code))
 		{

@@ -109,8 +109,8 @@ Facade::~Facade()
 	delete creator;
 	delete colorMode;
 	delete usersInterface;
-	delete converter;
-	delete display;
+//	delete converter;
+//	delete display;
 	delete loader;
 	delete saver;
 }

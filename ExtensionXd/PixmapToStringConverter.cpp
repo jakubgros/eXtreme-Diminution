@@ -9,8 +9,8 @@ PixmapToStringConverter::PixmapToStringConverter(ImgWithParam* img) :
 
 std::string PixmapToStringConverter::convert()
 {
-	for (int x = 0; x < img->width; ++x)
-		for (int y = 0; y < img->height; ++y)
+	for (int y = 0; y < img->height; ++y)
+		for (int x = 0; x < img->width; ++x)
 			addColorFromPalette(img->pixmap[x][y]);
 	return pixmap;
 }
