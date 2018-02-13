@@ -1,6 +1,7 @@
 #pragma once
 #include "Converter.h"
 #include <vector>
+#include "types.h"
 
 struct Rgb;
 
@@ -9,16 +10,22 @@ class ToDedicatedPixmapConverter : public BmpToXdConverter
 public:
 	explicit ToDedicatedPixmapConverter(ImgWithParam* imgWithParam);
 	~ToDedicatedPixmapConverter() = default;
-	void convert();
+	void convert() override;
+	void checkResources() const;
 private:
 	std::vector<Rgb> pixmap_;
+	int step_;
+	size_t numOfCols_;
 private:
-	void createPixmap();
-	void createSortedPixmap();
+	static Lab rgb2Lab(const Rgb color);
+	static Rgb lab2Rgb(const Lab color);
+	void convertToOneDimensionPixmap();
 	void findPalette();
+	void sortPixmap();
 	void findNewColors();
-	static void rgb2Lab(int R, int G, int B, double *l, double *a, double *b);
-	static void lab2Rgb(double L, double A, double B, int *r, int *g, int *b);
+	void countStep();
+	void addNewColor(const size_t startingPixel, const size_t endingPixel);
+	Lab countLabAvarage(size_t begin, size_t end);
 private:
 	ToDedicatedPixmapConverter(const ToDedicatedPixmapConverter&);
 	ToDedicatedPixmapConverter& operator=(const ToDedicatedPixmapConverter&);

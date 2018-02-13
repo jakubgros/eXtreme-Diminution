@@ -1,25 +1,33 @@
 #include "ToDedicatedPixmapConverter.h"
-#include "Types.h"
+#include "types.h"
 #include "DitheringFS.h"
 #include "RangeSort.h"
-#include <iostream>
 
 
 ToDedicatedPixmapConverter::ToDedicatedPixmapConverter(ImgWithParam* img) :
 	BmpToXdConverter(img),
-	pixmap_()
+	pixmap_(),
+	step_(0),
+	numOfCols_(0)
 {
 
 }
 
 void ToDedicatedPixmapConverter::convert()
 {
-	createPixmap();
+	checkResources();
+	convertToOneDimensionPixmap();
 	findPalette();
 	dfs::ditheringFs(&img->pixmap, &img->dedicatedColorPalette);
 }
 
-void  ToDedicatedPixmapConverter::createPixmap()
+void ToDedicatedPixmapConverter::checkResources() const
+{
+	if (img == nullptr)
+		throw std::logic_error("ToDedidactedPixmapConverter - nullptr resources");
+}
+
+void  ToDedicatedPixmapConverter::convertToOneDimensionPixmap()
 {
 	for (size_t y = 0; y < img->height; ++y)
 		for (size_t x = 0; x < img->width; ++x)
@@ -28,53 +36,63 @@ void  ToDedicatedPixmapConverter::createPixmap()
 
 void ToDedicatedPixmapConverter::findPalette()
 {
-	createSortedPixmap();
+	sortPixmap();
 	findNewColors();
 }
 
-void ToDedicatedPixmapConverter::createSortedPixmap()
+void ToDedicatedPixmapConverter::sortPixmap()
 {
 	RangeSort rs(&img->pixmap, img->dedicatedColorPalette.size());
 	pixmap_ = rs.sort();
 }
 
-
 void ToDedicatedPixmapConverter::findNewColors()
+{
+	countStep();
+	for (size_t startingPixel = 0; startingPixel < pixmap_.size(); startingPixel += step_)
+		if (numOfCols_ < img->dedicatedColorPalette.size())
+			addNewColor(startingPixel, startingPixel + step_);
+		else
+			break;
+}
+
+void ToDedicatedPixmapConverter::countStep()
 {
 	if (pixmap_.size() <= img->dedicatedColorPalette.size())
 		step_ = 1;
 	else
 		step_ = pixmap_.size() / img->dedicatedColorPalette.size();
-
-	for (size_t i = 0 , numOfCols = 0; i < pixmap_.size(); i += step_, ++numOfCols)
-	{
-		if (numOfCols < img->dedicatedColorPalette.size())
-		{
-			long double sumL = 0;
-			long double sumA = 0;
-			long double sumB = 0;
-			int j = i;
-			for (j = i; j < i + step_; ++j)
-			{
-				Lab lab{};
-				rgb2Lab(pixmap_[j].r, pixmap_[j].g, pixmap_[j].b, &lab.l, &lab.a, &lab.b);
-				sumL += lab.l;
-				sumA += lab.a;
-				sumB += lab.b;
-			}
-			Lab avarage = { sumL / (step_), sumA / (step_), sumB / (step_) };
-			Rgb newColor;
-			lab2Rgb(avarage.l, avarage.a, avarage.b, &newColor.r, &newColor.g, &newColor.b);
-			img->dedicatedColorPalette[numOfCols] = newColor;
-		}
-	}
 }
 
-void ToDedicatedPixmapConverter::rgb2Lab(int R, int G, int B, double *l, double *a, double *b)
+void ToDedicatedPixmapConverter::addNewColor(const size_t startingPixel, const size_t endingPixel)
 {
-	double var_R = R / 255.;
-	double var_G = G / 255.;
-	double var_B = B / 255.;
+	const Lab avarage = countLabAvarage(startingPixel, endingPixel);
+	const Rgb newColor = lab2Rgb(avarage);
+	img->dedicatedColorPalette[numOfCols_] = newColor;
+	++numOfCols_;
+}
+
+Lab ToDedicatedPixmapConverter::countLabAvarage(size_t begin, size_t end)
+{
+	long double sumL = 0;
+	long double sumA = 0;
+	long double sumB = 0;
+	for (size_t j = begin; j < end; ++j)
+	{
+		const Lab lab = rgb2Lab(pixmap_[j]);
+		sumL += lab.l;
+		sumA += lab.a;
+		sumB += lab.b;
+	}
+	const size_t numOfItems = end - begin;
+	return { static_cast<double>(sumL / numOfItems), static_cast<double>(sumA / numOfItems), static_cast<double>(sumB / numOfItems) };
+}
+
+Lab ToDedicatedPixmapConverter::rgb2Lab(const Rgb color)
+{
+	double var_R = color.r / 255.;
+	double var_G = color.g / 255.;
+	double var_B = color.b / 255.;
 
 	if (var_R > 0.04045)
 		var_R = pow(((var_R + 0.055) / 1.055), 2.4);
@@ -97,9 +115,9 @@ void ToDedicatedPixmapConverter::rgb2Lab(int R, int G, int B, double *l, double 
 	double Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
 	double Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
 
-	double ReferenceX = 95.047;
-	double ReferenceY = 100;
-	double ReferenceZ = 108.883;
+	const double ReferenceX = 95.047;
+	const double ReferenceY = 100;
+	const double ReferenceZ = 108.883;
 
 	double var_X = X / ReferenceX;
 	double var_Y = Y / ReferenceY;
@@ -118,22 +136,22 @@ void ToDedicatedPixmapConverter::rgb2Lab(int R, int G, int B, double *l, double 
 	else
 		var_Z = (7.787 * var_Z) + (16. / 116);
 
-	*l = (116 * var_Y) - 16;
-	*a = 500 * (var_X - var_Y);
-	*b = 200 * (var_Y - var_Z);
+	Lab newColor = {};
+	newColor.l = (116 * var_Y) - 16;
+	newColor.a = 500 * (var_X - var_Y);
+	newColor.b = 200 * (var_Y - var_Z);
+	return newColor;
 }
 
-void ToDedicatedPixmapConverter::lab2Rgb(double L, double A, double B, int *r, int *g, int *b)
+Rgb ToDedicatedPixmapConverter::lab2Rgb(const Lab color)
 {
+	const double ReferenceX = 95.047;
+	const double ReferenceY = 100;
+	const double ReferenceZ = 108.883;
 
-	double ReferenceX = 95.047;
-	double ReferenceY = 100;
-	double ReferenceZ = 108.883;
-
-
-	double var_Y = (L + 16) / 116.;
-	double var_X = A / 500. + var_Y;
-	double var_Z = var_Y - B / 200.;
+	double var_Y = (color.l + 16) / 116.;
+	double var_X = color.a / 500. + var_Y;
+	double var_Z = var_Y - color.b / 200.;
 
 	if (pow(var_Y, 3) > 0.008856)
 		var_Y = pow(var_Y, 3);
@@ -173,7 +191,9 @@ void ToDedicatedPixmapConverter::lab2Rgb(double L, double A, double B, int *r, i
 	else
 		var_B = 12.92 * var_B;
 
-	*r = var_R * 255;
-	*g = var_G * 255;
-	*b = var_B * 255;
+	Rgb newColor{};
+	newColor.r = var_R * 255;
+	newColor.g = var_G * 255;
+	newColor.b = var_B * 255;
+	return newColor;
 }

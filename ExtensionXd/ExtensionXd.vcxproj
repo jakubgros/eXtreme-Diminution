@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="BmpFileReader.h" />
     <ClInclude Include="BmpFileWriter.h" />
+    <ClInclude Include="ColorFinder.h" />
     <ClInclude Include="Compressor.h" />
     <ClInclude Include="Converter.h" />
     <ClInclude Include="Decompressor.h" />
@@ -52,6 +53,7 @@
   <ItemGroup>
     <ClCompile Include="BmpFileReader.cpp" />
     <ClCompile Include="BmpFileWriter.cpp" />
+    <ClCompile Include="ColorFinder.cpp" />
     <ClCompile Include="Compressor.cpp" />
     <ClCompile Include="Converter.cpp" />
     <ClCompile Include="Decompressor.cpp" />

@@ -102,6 +102,9 @@
     <ClInclude Include="RangeSort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ColorFinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UsersInterface.cpp">
@@ -192,6 +195,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RangeSort.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorFinder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
