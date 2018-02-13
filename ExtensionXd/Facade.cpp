@@ -1,19 +1,28 @@
 ﻿#include "Facade.h"
 #include "Loader.h"
 #include "Converter.h"
-#include "Types.h"
+#include "types.h"
 #include "Saver.h"
 #include "Display.h"
+#include <iostream> //TODO usunąć
+#include <ctime>  //TODO usunac
+
 
 void Facade::run()
 {
 	getInfoFromUser();
 	makeCreator();
+	clock_t begin_time = clock();		//TODO usunac
 	load();
+	std::cout << "loading time: " << float(clock() - begin_time) / CLOCKS_PER_SEC << std::endl; //TODO usunac
+	begin_time = clock();
 	convert();
+	std::cout << "converting time: " << float(clock() - begin_time) / CLOCKS_PER_SEC << std::endl; //TODO usunac
 	if(img->fileType=="xd")
 		printImg();
+	begin_time = clock();
 	save();
+	std::cout << "saving time: " << float(clock() - begin_time) / CLOCKS_PER_SEC << std::endl; //TODO usunac
 }
 
 void Facade::fillImposedPalettes()
@@ -33,6 +42,7 @@ void Facade::fillImposedPalettes()
 	for (int j = 0; j < 255; j += 4)
 	{
 		img->imposedGreyPalette[i] = { j, j, j };
+		std::cout << j << std::endl;			//TODO usunąć
 		++i;
 	}
 

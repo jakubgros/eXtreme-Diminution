@@ -1,23 +1,31 @@
 ﻿#pragma once
-#include "Types.h"
+#include "types.h"
 #include <functional>
+#include "ColorFinder.h"
 
 class DitheringFs
 {
 public:
-	void operator() (Pixmap* pixmap, const Palette* palette, std::function<Rgb(const Rgb&)> findColorInPalette = nullptr);
+	DitheringFs() = default;
+	~DitheringFs() = default;
+	void operator() (Pixmap* pixmap, const Palette* palette, const std::function<Rgb(const Rgb&)>& findColorInPalette = nullptr);
 private:
 	Pixmap* pixmap_ = nullptr;
 	const Palette* palette_ = nullptr;
 	std::function<Rgb(const Rgb&)> findColorInPalette_ = nullptr;
+	Pixmap error_;
+	ColorFinder defaultFinder_;
 private:
-	static Rgb rgb2Yuv(const Rgb& color);
-	static double countDistance(const Rgb& color1, const Rgb& color2);
-	void updateQuantError(const size_t x, const size_t y, const Rgb& newColor);
+	static void adjustTo8Bits(Rgb& newColor);
+	static void adjustRange(int& component);
+	void assignResources(Pixmap* pixmap, const Palette* palette, const std::function<Rgb(const Rgb&)> findColorInPalette);
 	void checkResources() const;
+	void initErrorTable();
+	void resizeErrorTable();
+	void clearErrorTable();
 	void dither();
-	Rgb findNewColor(const Rgb& currentColor) const;
-	Rgb findClosestPaletteColor(const Rgb& color) const;
+	Rgb findNewColor(const Rgb& currentColor);
+	void updateQuantError(const size_t x, const size_t y, const Rgb& newColor);
 };
 
 namespace dfs

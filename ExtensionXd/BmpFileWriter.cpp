@@ -1,121 +1,171 @@
 #include "BmpFileWriter.h"
 #include <vector>
-#include <fstream>
 
 BmpFileWriter::BmpFileWriter(const ImgWithParam* img) :
 	FileWriter(img),
-	data(),
-	outputDataSeries(nullptr),
-	file(),
-	bfh(),
-	bih()
+	file_(),
+	bfh_(),
+	bih_(),
+	pixmapSize_(0),
+	fileSize_(0)
 {
 
+}
+
+BmpFileWriter::~BmpFileWriter()
+{
+	if(file_.is_open())
+		file_.close();
 }
 
 bool BmpFileWriter::write()
 {
-	init();
-	createOutputData();
-	createOutputDataSeries();
-	writeBmp();
-	delete[] outputDataSeries;
+	try
+	{
+		init();
+		writeBmp();
+	}
+	catch (std::exception& e)
+	{
+		return false;
+	}
 	return true;
 }
 
+
 void BmpFileWriter::init()
 {
+	initFile();
 	initFileHeader();
 	initImageHeader();
 }
 
+void BmpFileWriter::initFile()
+{
+	file_.open(img->outputFilepath, std::ios::out | std::ios::binary);
+}
+
 void BmpFileWriter::initFileHeader()
 {
-	bfh.bitmapType[0] = 'B';
-	bfh.bitmapType[1] = 'M';
-	bfh.fileSize = 0;
-	bfh.reserved = 0;
-	bfh.offsetBits = 0;
+	bfh_.bitmapType[0] = 'B';
+	bfh_.bitmapType[1] = 'M';
+	bfh_.fileSize = 0;
+	bfh_.reserved = 0;
+	bfh_.offsetBits = 54;
 }
 
 void BmpFileWriter::initImageHeader()
 {
-	bih.bitmapInfoHeader = 40;
-	bih.width = img->width;
-	bih.height = img->height;
-	bih.planes = 1;
-	bih.bitCount = 24;
-	bih.compression = 0;
-	bih.imageSize = 0;
-	bih.horizontalRes = 2835;
-	bih.verticalRes = 2835;
-	bih.clrUsed = 0;
-	bih.clrImportant = 0;
-}
-
-void BmpFileWriter::createOutputData()
-{
-	putBytes(bfhSize, bfh);
-	putBytes(bihSize, bih);
-	putPixmap();
-	updateFileSize();
-	updatePixmapSize();
-	updateFileSize();
-	updatePixmapSize();
-}
-
-template <typename T>
-void BmpFileWriter::putBytes(const unsigned nOfBytes, const T& source)
-{
-	uint8_t* dividedSource = (uint8_t*)&source;
-	for (size_t i = 0; i < nOfBytes; ++i)
-		data.push_back(dividedSource[i]);
-}
-
-void BmpFileWriter::putBGR(const int x, const int y)
-{
-	data.push_back(static_cast<uint8_t>(img->pixmap[x][y].b));
-	data.push_back(static_cast<uint8_t>(img->pixmap[x][y].g));
-	data.push_back(static_cast<uint8_t>(img->pixmap[x][y].r));
-}
-
-void BmpFileWriter::putPadding()
-{
-	while ((data.size() - bfhSize - bihSize) % 4)
-		data.push_back(0);
-}
-
-void BmpFileWriter::putPixmap()
-{
-	for (size_t y = 0; y < img->height; ++y)
-	{
-		for (size_t x = 0; x < img->width; ++x)
-			putBGR(x, y);
-		putPadding();
-	}
-}
-
-void BmpFileWriter::updateFileSize()
-{
-	uint32_t fileSize = data.size();
-	memcpy(&data[fileSizeOffset], &fileSize, 4);
-}
-
-void BmpFileWriter::updatePixmapSize()
-{
-	uint32_t pixmapSize = data.size() - bfhSize - bihSize;
-	memcpy(&data[pixmapOffset], &pixmapSize, 4);
-}
-
-void BmpFileWriter::createOutputDataSeries()
-{
-	outputDataSeries = new uint8_t[data.size()];
-	memcpy(outputDataSeries, &data[0], data.size());
+	bih_.bitmapInfoHeader = 40;
+	bih_.width = img->width;
+	bih_.height = img->height;
+	bih_.planes = 1;
+	bih_.bitCount = 24;
+	bih_.compression = 0;
+	bih_.imageSize = 0;
+	bih_.horizontalRes = 2835;
+	bih_.verticalRes = 2835;
+	bih_.clrUsed = 0;
+	bih_.clrImportant = 0;
 }
 
 void BmpFileWriter::writeBmp()
 {
-	file.open(img->outputFilepath);
-	file.write((const char*)outputDataSeries, data.size());
-	file.close();
+	writeFileHeader();
+	writeImageHeader();
+	writePixmap();
+	updatePixmapSize();
+	updateFileSize();
+}
+
+void BmpFileWriter::writeFileHeader()
+{
+	file_.write(reinterpret_cast<const char*>(&bfh_.bitmapType), 2);
+	file_.write(reinterpret_cast<const char*>(&bfh_.fileSize), 4);
+	file_.write(reinterpret_cast<const char*>(&bfh_.reserved), 4);
+	file_.write(reinterpret_cast<const char*>(&bfh_.offsetBits), 4);
+}
+
+void BmpFileWriter::writeImageHeader()
+{
+	file_.write(reinterpret_cast<const char*>(&bih_.bitmapInfoHeader), 4);
+	file_.write(reinterpret_cast<const char*>(&bih_.width), 4);
+	file_.write(reinterpret_cast<const char*>(&bih_.height), 4);
+	file_.write(reinterpret_cast<const char*>(&bih_.planes), 2);
+	file_.write(reinterpret_cast<const char*>(&bih_.bitCount), 2);
+	file_.write(reinterpret_cast<const char*>(&bih_.compression), 4);
+	file_.write(reinterpret_cast<const char*>(&bih_.imageSize), 4);
+	file_.write(reinterpret_cast<const char*>(&bih_.horizontalRes), 4);
+	file_.write(reinterpret_cast<const char*>(&bih_.verticalRes), 4);
+	file_.write(reinterpret_cast<const char*>(&bih_.clrUsed), 4);
+	file_.write(reinterpret_cast<const char*>(&bih_.clrImportant), 4);
+}
+
+void BmpFileWriter::writePixmap()
+{
+	const int nOfPads = countPads();
+	for (int y = 0; y < img->height; ++y)
+	{
+		for (int x = 0; x < img->width; ++x)
+			writePixel(x, y);
+		writePads(nOfPads);
+	}
+}
+
+int BmpFileWriter::countPads() const
+{
+	const int nOfPads = 4 - (img->width * 3) % 4;
+	return ((nOfPads == 4) ? 0 : nOfPads);
+}
+
+void BmpFileWriter::writePixel(const int x, const int y)
+{
+	file_.write(reinterpret_cast<const char*>(&img->pixmap[x][y].b), 1);
+	file_.write(reinterpret_cast<const char*>(&img->pixmap[x][y].g), 1);
+	file_.write(reinterpret_cast<const char*>(&img->pixmap[x][y].r), 1);
+}
+
+void BmpFileWriter::writePads(const int nOfPads)
+{
+	const int pad = 0;
+	for (int i = 0; i < nOfPads; ++i)
+		file_.write(reinterpret_cast<const char*>(&pad), 1);
+}
+
+void BmpFileWriter::updatePixmapSize()
+{
+	pixmapSize_ = countPixmapSize();
+	writePixmapSize();
+}
+
+unsigned BmpFileWriter::countPixmapSize() const
+{
+	return img->height * (img->width * 3 + 4-(img->width * 3) % 4);
+}
+
+void BmpFileWriter::writePixmapSize()
+{
+	const std::streampos init = file_.tellp();
+	file_.seekp(pixmapOffset);
+	file_.write(reinterpret_cast<const char*>(&pixmapSize_), 4);
+	file_.seekp(init);
+}
+
+void BmpFileWriter::updateFileSize()
+{
+	fileSize_ = countFileSize();
+	writeFileSize();
+}
+
+unsigned BmpFileWriter::countFileSize() const
+{
+	return pixmapSize_ + bihSize + bfhSize;
+}
+
+void BmpFileWriter::writeFileSize()
+{
+	const std::streampos init = file_.tellp();
+	file_.seekp(fileSizeOffset);
+	file_.write(reinterpret_cast<const char*>(&fileSize_), 4);
+	file_.seekp(init);
 }

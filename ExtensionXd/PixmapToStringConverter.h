@@ -1,20 +1,24 @@
 #pragma once
 #include "types.h"
-#include <string>
-#include <iostream> //delete if no exception thrown
 
 class PixmapToStringConverter
 {
 public:
-	explicit PixmapToStringConverter(ImgWithParam* img);
+	explicit PixmapToStringConverter(Pixmap* pixmap, Palette* palette);
+	~PixmapToStringConverter() = default;
 	std::string convert();
-	std::string getPixmap();
+	std::string getPixmap() const;
 private:
-	ImgWithParam* img;
-	std::string pixmap;
+	Pixmap* pixmap_;
+	Palette* palette_;
+	std::string sPixmap_;
 private:
 	void addColorFromPalette(const Rgb& pixel);
-	void addFromGreyScale(const Rgb& pixel);
-	void addFromImposed(const Rgb& pixel);
-	void addFromDedicated(const Rgb& pixel);
+	size_t findInPalette(const Rgb& pixel);
+	void addColor(size_t color);
+	void twosComplement(size_t color);
+	void checkIfFound(size_t colorNumber) const;
+private:
+	PixmapToStringConverter(const PixmapToStringConverter&);
+	PixmapToStringConverter& operator=(const PixmapToStringConverter&);
 };

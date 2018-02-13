@@ -1,9 +1,6 @@
 #pragma once
 #include "Converter.h"
 #include <vector>
-#include <queue>
-#include "Range.h"
-#include <iostream>
 
 struct Rgb;
 
@@ -14,7 +11,7 @@ public:
 	~ToDedicatedPixmapConverter() = default;
 	void convert();
 private:
-	std::vector<Rgb> pixmap;
+	std::vector<Rgb> pixmap_;
 private:
 	void createPixmap();
 	void createSortedPixmap();

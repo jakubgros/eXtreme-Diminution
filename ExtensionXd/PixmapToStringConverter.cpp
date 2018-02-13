@@ -1,79 +1,58 @@
 #include "PixmapToStringConverter.h"
+#include <string>
 
-PixmapToStringConverter::PixmapToStringConverter(ImgWithParam* img) :
-	img(img),
-	pixmap("")
+PixmapToStringConverter::PixmapToStringConverter(Pixmap* pixmap, Palette* palette) :
+	pixmap_(pixmap),
+	palette_(palette),
+	sPixmap_("")
 {
 
 }
 
 std::string PixmapToStringConverter::convert()
 {
-	for (int y = 0; y < img->height; ++y)
-		for (int x = 0; x < img->width; ++x)
-			addColorFromPalette(img->pixmap[x][y]);
-	return pixmap;
+	for (int y = 0; y < (*pixmap_)[0].size(); ++y)
+		for (int x = 0; x < (*pixmap_).size(); ++x)
+			addColorFromPalette((*pixmap_)[x][y]);
+	return sPixmap_;
 }
 
 void PixmapToStringConverter::addColorFromPalette(const Rgb& pixel)
 {
-	switch (img->colorMode)
-	{
-	case GREY_SCALE:
-		addFromGreyScale(pixel);
-		break;
-	case DEDICATED:
-		addFromDedicated(pixel);
-		break;
-	case IMPOSED:
-		addFromImposed(pixel);
-		break;
-	}
+	size_t colorNumber = findInPalette(pixel);
+	checkIfFound(colorNumber);
+	addColor(colorNumber);
 }
 
-void PixmapToStringConverter::addFromGreyScale(const Rgb& pixel)
+size_t PixmapToStringConverter::findInPalette(const Rgb& pixel)
 {
-	for (int color = 0; color < img->imposedGreyPalette.size(); ++color)
+	for (size_t color = 0; color < (*palette_).size(); ++color)
 	{
-		if (img->imposedGreyPalette[color] == pixel)
-		{
-			if (color < 10)
-				pixmap += '0';
-			pixmap += std::to_string(color);
-			break;
-		}
+		if ((*palette_)[color] == pixel)
+			return color;
 	}
+	return UINT32_MAX;
 }
 
-void PixmapToStringConverter::addFromImposed(const Rgb& pixel)
+void PixmapToStringConverter::addColor(size_t color)
 {
-	for (int color = 0; color < img->imposedColorPalette.size(); ++color)
-	{
-		if (img->imposedColorPalette[color] == pixel)
-		{
-			if (color < 10)
-				pixmap += '0';
-			pixmap += std::to_string(color);
-			break;
-		}
-	}
+	twosComplement(color);
+	sPixmap_ += std::to_string(color);
 }
 
-void PixmapToStringConverter::addFromDedicated(const Rgb& pixel)
+void PixmapToStringConverter::twosComplement(const size_t color)
 {
-	for (int color = 0; color < img->dedicatedColorPalette.size(); ++color)
-	{
-		if (img->dedicatedColorPalette[color] == pixel)
-		{
-			if (color < 10)
-				pixmap += '0';
-			pixmap += std::to_string(color);
-			break;
-		}
-	}
+	if (color < 10)
+		sPixmap_ += '0';
 }
 
-std::string PixmapToStringConverter::getPixmap()
+void PixmapToStringConverter::checkIfFound(size_t colorNumber) const
 {
-	return pixmap;
+	if (colorNumber == UINT32_MAX)
+		throw std::logic_error("PixmapToStringConverter - brak koloru w palecie");
+}
+
+std::string PixmapToStringConverter::getPixmap() const
+{
+	return sPixmap_;
 }

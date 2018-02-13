@@ -20,6 +20,7 @@ private:
 	HTNode* root;
 	Dictionary* dictionary;
 private:
+	static Palette* choosePalette(ImgWithParam* img);
 	void makeList();
 	void makeTree();
 

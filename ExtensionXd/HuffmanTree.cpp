@@ -14,12 +14,13 @@ struct HTNode
 HuffmanTree::HuffmanTree(ImgWithParam* const img) :
 	img(img),
 	pixmap(""),
-	ptsc(img),
+	ptsc(&img->pixmap, choosePalette(img)),
 	root(nullptr),
 	dictionary(new Dictionary)
 {
 
 }
+
 
 
 HuffmanTree::~HuffmanTree()
@@ -35,6 +36,21 @@ void HuffmanTree::run()
 //	std::cout << "compressed" << std::endl;
 //	compress();
 //	decompress();
+}
+
+Palette* HuffmanTree::choosePalette(ImgWithParam* img)
+{
+	switch(img->colorMode)
+	{
+	case DEDICATED:
+		return &img->dedicatedColorPalette;
+	case IMPOSED:
+		return &img->imposedColorPalette;
+	case GREY_SCALE:
+		return &img->imposedGreyPalette;
+	default:
+		return nullptr;
+	}
 }
 
 void HuffmanTree::makeList()
@@ -153,16 +169,20 @@ void HuffmanTree::compress()
 		c[0] = pixmap[i];
 		c[1] = pixmap[i + 1];
 		int g = (c[0] - '0') * 10 + (c[1] - '0');
+		bool isFound = false;
 		for(int color = 0; color < dictionary->size(); ++color)
 		{
 			if (g == (*dictionary)[color].number)
 			{
 				img->compressedPixmap.push_back((*dictionary)[color].codeWord);
+				isFound = true;
+				break;
 				//std::cout << (*dictionary)[color].codeWord << " ";
 			}
-			else 
-				throw std::exception("invalid pixmap");
 		}
+		if (!isFound)
+			throw std::logic_error("HuffmanTree::compress() - no such color in palette");
+		isFound = false;
 	}
 }
 

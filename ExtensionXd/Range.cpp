@@ -2,93 +2,83 @@
 #include <stdexcept>
 
 Range::Range(const int min,const int max) :
-	_min(min),
-	_max(max)
+	min_(min),
+	max_(max)
+{
+	checkResources(min, max);
+}
+
+void Range::checkResources(const int min, const int max)
 {
 	if (min > max)
-		throw new std::logic_error("Range::Range = min > max ");
+		throw new std::invalid_argument("Range::Range = min > max ");
 }
 
 Range::Range() :
-	_min(0),
-	_max(0)
+	min_(INT_MAX),
+	max_(INT_MIN)
 {
 
 }
 
 int Range::getRange() const
 {
-	return _max - _min;
+	return max_ - min_;
 }
 
 void Range::setMin(const int min)
 {
-	_min = min;
+	min_ = min;
 }
 
 void Range::setMax(const int max)
 {
-	_max = max;
+	max_ = max;
 }
 
 void Range::update(const int value)
 {
-	if (_min > value)
-		_min = value;
+	if (min_ > value)
+		min_ = value;
 	else
-		if (_max < value)
-			_max = value;
+		if (max_ < value)
+			max_ = value;
 }
 
 
 bool Range::operator < (const Range &range) const
 {
-	if (this->getRange() < range.getRange())
-		return true;
-	else
-		return false;
+	return this->getRange() < range.getRange();
 }
 
 bool Range::operator <= (const Range &range) const
 {
-	if (this->getRange() <= range.getRange())
-		return true;
-	else
-		return false;
+	return this->getRange() <= range.getRange();
 }
 
 bool Range::operator > (const Range &range) const
 {
-	if (this->getRange() > range.getRange())
-		return true;
-	else
-		return false;
+	return this->getRange() > range.getRange();
 }
 
 bool Range::operator >= (const Range &range) const
 {
-	if (this->getRange() >= range.getRange())
-		return true;
-	else
-		return false;
+	return this->getRange() >= range.getRange();
 }
 
 bool Range::operator == (const Range &range) const
 {
-	if (this->getRange() == range.getRange())
-		return true;
-	else
-		return false;
+	return this->getRange() == range.getRange();
 }
 
 Range Range::operator *(const double &value) const
 {
-	return Range(_min*value, _max*value);
+	return { static_cast<int>(min_*value), static_cast<int>(max_*value) };
 }
 
 Range& Range::operator *=(const double &value)
 {
-	this->_min*=value;
-	this->_max*=value;
+	this->min_*=value;
+	this->max_*=value;
 	return *this;
 }

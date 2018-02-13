@@ -1,6 +1,4 @@
 #include "XdDecompressor.h"
-#include <iostream> //delete if no exception thrown
-
 
 XdDecompressor::XdDecompressor(ImgWithParam* img) :
 	Decompressor(img)
@@ -14,8 +12,6 @@ XdDecompressor::~XdDecompressor()
 
 void XdDecompressor::decompress(const Dictionary* dictionary)
 {
-	//std::cout << std::endl;
-	//std::cout << "Decompressed" << std::endl;
  	for (int i = 0; i < img->compressedPixmap.size(); ++i)
 	{
 		for (int j = 0; j < dictionary->size(); ++j)

@@ -1,50 +1,37 @@
 #include "BmpFileReader.h"
 #include <SDL.h>
-#include "Types.h"
-#include <iostream>
 
 BmpFileReader::BmpFileReader(ImgWithParam* img) :
 	FileReader(img),
-	imgSurface(nullptr)
+	imgSurface_(nullptr)
 {
 
 }
 
-Uint8* BmpFileReader::getPixelAddress(const int x, const int y)
+void BmpFileReader::read()
 {
-	/* Pobieramy informacji ile bajtów zajmuje jeden pixel */
-	const int bpp = imgSurface->format->BytesPerPixel;
-	/* Obliczamy adres pixela */
-	return (Uint8*)imgSurface->pixels + y * imgSurface->pitch + x * bpp;
-}
-
-SDL_Color BmpFileReader::getPixel(const int x, const int y)
-{
-	Uint8* pixelAddress = getPixelAddress(x, y);
-	SDL_Color color = {};
-	if (pixelAddress)
-	{
-		Uint32 rgbColor = 0;
-		memcpy(&rgbColor, pixelAddress, imgSurface->format->BytesPerPixel);
-		SDL_GetRGB(rgbColor, imgSurface->format, &color.r, &color.g, &color.b);
-	}
-	return color;
+	loadSurface();
+	readDimensions();
+	initPixmap();
+	readPixmap();
 }
 
 void BmpFileReader::loadSurface()
 {
-	imgSurface = SDL_LoadBMP(img->inputFilepath.c_str());
-	if (imgSurface == nullptr)
-	{
-		std::string* msg = new std::string("Cannot load BMP file");
-		throw std::exception(msg->c_str());
-	}
+	imgSurface_ = SDL_LoadBMP(img->inputFilepath.c_str());
+	checkResources();
+}
+
+void BmpFileReader::checkResources() const
+{
+	if (imgSurface_ == nullptr)
+		throw std::logic_error("BmpFileReader - cannot load BMP file");
 }
 
 void BmpFileReader::readDimensions()
 {
-	img->width = imgSurface->w;
-	img->height = imgSurface->h;
+	img->width = imgSurface_->w;
+	img->height = imgSurface_->h;
 }
 
 void BmpFileReader::initPixmap()
@@ -64,10 +51,25 @@ void BmpFileReader::readPixmap()
 		}
 }
 
-void BmpFileReader::read()
+SDL_Color BmpFileReader::getPixel(const int x, const int y) const
 {
-	loadSurface();
-	readDimensions();
-	initPixmap();
-	readPixmap();
+	Uint8* pixelAddress = getPixelAddress(x, y);
+	SDL_Color pixel = {};
+	if (pixelAddress)
+		copyPixelFromAddress(pixelAddress, pixel);
+	return pixel;
+}
+
+Uint8* BmpFileReader::getPixelAddress(const int x, const int y) const
+{
+	const int bpp = imgSurface_->format->BytesPerPixel;
+	Uint8* pixelAddress = static_cast<Uint8*>(imgSurface_->pixels) + y * imgSurface_->pitch + x * bpp;
+	return pixelAddress;
+}
+
+void BmpFileReader::copyPixelFromAddress(Uint8* pixelAddress, SDL_Color& pixel) const
+{
+	Uint32 rgbColor = 0;
+	memcpy(&rgbColor, pixelAddress, imgSurface_->format->BytesPerPixel);
+	SDL_GetRGB(rgbColor, imgSurface_->format, &pixel.r, &pixel.g, &pixel.b);
 }
