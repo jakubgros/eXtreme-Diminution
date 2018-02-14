@@ -82,6 +82,8 @@ void XdFileReader::readDictionary()
 
 	for(int i=0; i < dictSize; ++i)
 		readWord((*dictionary)[i]);
+
+	makeHashedDict();
 }
 
 void XdFileReader::readWord(Word& word)
@@ -89,6 +91,12 @@ void XdFileReader::readWord(Word& word)
 	size_t codeLength=bitStream.read<size_t>(6);
 	readCode(word, codeLength);
 	word.number=bitStream.read<int>(6);
+}
+
+void XdFileReader::makeHashedDict()
+{
+	for(auto iter=dictionary->begin(); iter!=dictionary->end(); ++iter)
+		hashedDictionary.insert(std::pair<std::string, int>(iter->codeWord, iter->number));	
 }
 
 void XdFileReader::readCode(Word& word, size_t codeLength)
@@ -133,12 +141,7 @@ void XdFileReader::initPixmap()
 
 bool XdFileReader::isCodeInDict(const std::string& str)
 {
-	for(int i=0; i<dictionary->size(); ++i)
-	{
-		if((*dictionary)[i].codeWord==str)
-			return true;
-	}
-	return false;
+	return hashedDictionary.find(str)!=hashedDictionary.end();
 }
 
 const Dictionary * XdFileReader::getDictionary()
