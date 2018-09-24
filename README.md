@@ -5,3 +5,5 @@ This project has been created for my studies. I had to write specification of my
 My part in this project were: Facade, FileBitStream, ObjectsCreator, Loader, Saver, XdFileReader, XdFileWriter, Cocreation of application's structure.
 
 In this project I have learnt how to buffer data, operate on binary data and I have improved my OOP design.
+
+Commits in this project are very chaotic, because we haven't known how to use git properly yet.
